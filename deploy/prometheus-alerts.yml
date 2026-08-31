@@ -1,0 +1,46 @@
+# Fylo alerting rules (backbone §17.2).
+groups:
+  - name: fylo
+    rules:
+      - alert: HighTransferErrorRate
+        expr: rate(fylo_transfer_errors_total[5m]) > 0.05
+        for: 2m
+        labels: { severity: warning }
+        annotations:
+          summary: "Transfer error rate above 5%"
+
+      - alert: HighMemoryUsage
+        expr: fylo_jvm_heap_used_bytes / fylo_jvm_heap_max_bytes > 0.85
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "JVM heap above 85%"
+
+      - alert: DatabaseConnectionsHigh
+        # Requires postgres_exporter alongside PostgreSQL.
+        expr: pg_stat_activity_count > 80
+        for: 2m
+        labels: { severity: warning }
+        annotations:
+          summary: "Postgres connections above 80"
+
+      - alert: WebSocketDropped
+        expr: fylo_websocket_connections_active == 0
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "No active WebSocket connections for 5 minutes"
+
+      - alert: StorageNearlyFull
+        expr: fylo_storage_used_bytes > (10737418240 * 0.9)
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Default storage limit 90% used"
+
+      - alert: BackendDown
+        expr: up{job="fylo-backend"} == 0
+        for: 1m
+        labels: { severity: critical }
+        annotations:
+          summary: "Fylo backend scrape target down"

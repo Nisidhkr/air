@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: fylo
+data:
+  # In-cluster scrape config (pods discovered via the backend service).
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    rule_files:
+      - /etc/prometheus/prometheus-alerts.yml
+    scrape_configs:
+      - job_name: fylo-backend
+        metrics_path: /metrics
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces: { names: [fylo] }
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            regex: backend-service
+            action: keep
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            regex: http
+            action: keep
+  # Mounted alongside; source of truth is deploy/prometheus-alerts.yml.
+  prometheus-alerts.yml: |
+    groups:
+      - name: fylo
+        rules:
+          - alert: HighTransferErrorRate
+            expr: rate(fylo_transfer_errors_total[5m]) > 0.05
+            for: 2m
+            labels: { severity: warning }
+            annotations: { summary: "Transfer error rate above 5%" }
+          - alert: HighMemoryUsage
+            expr: fylo_jvm_heap_used_bytes / fylo_jvm_heap_max_bytes > 0.85
+            for: 5m
+            labels: { severity: critical }
+            annotations: { summary: "JVM heap above 85%" }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: fylo
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: prometheus }
+  template:
+    metadata:
+      labels: { app: prometheus }
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.51.0
+          args: ["--config.file=/etc/prometheus/prometheus.yml",
+                 "--storage.tsdb.path=/prometheus"]
+          ports:
+            - { containerPort: 9090 }
+          volumeMounts:
+            - { name: config, mountPath: /etc/prometheus }
+            - { name: data, mountPath: /prometheus }
+      volumes:
+        - name: config
+          configMap: { name: prometheus-config }
+        - name: data
+          persistentVolumeClaim: { claimName: prometheus-pvc }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-pvc
+  namespace: fylo
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests: { storage: 20Gi }

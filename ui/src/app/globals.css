@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  color: theme('colors.neutral.900');
+  background: white;
+}
+
+@layer components {
+  .btn-primary {
+    @apply rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:opacity-50;
+  }
+
+  .input-field {
+    @apply w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none;
+  }
+}

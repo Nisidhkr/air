@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Air — Upload</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f0f0f;
+    color: #e5e5e5;
+    font-family: system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: #1a1a2e;
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    padding: 28px;
+    position: relative;
+  }
+  h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+  .sub { color: #8888a0; font-size: 13px; margin-top: 4px; }
+  .badge {
+    position: absolute; top: 24px; right: 24px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .badge.free { background: #3a2a12; color: #f59e0b; }
+  .badge.premium { background: #12233a; color: #3b82f6; }
+  .badge.guest { background: #26263a; color: #8888a0; }
+
+  /* Login */
+  .login-toggle { margin-top: 18px; font-size: 13px; color: #8888a0; cursor: pointer; background: none; border: none; }
+  .login-toggle:hover { color: #e5e5e5; }
+  .login { display: none; margin-top: 10px; gap: 8px; flex-direction: column; }
+  .login.open { display: flex; }
+  .login input {
+    background: #0f0f1a; border: 1px solid #2a2a44; color: #e5e5e5;
+    border-radius: 8px; padding: 9px 12px; font-size: 14px;
+  }
+  .login input:focus { outline: none; border-color: #3b82f6; }
+  .login .row { display: flex; gap: 8px; }
+  .who { font-size: 13px; color: #8888a0; margin-top: 10px; }
+  .who a { color: #3b82f6; cursor: pointer; }
+
+  /* Drop zone */
+  .drop {
+    margin-top: 20px; border: 2px dashed #2a2a44; border-radius: 12px;
+    padding: 36px 20px; text-align: center; cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .drop:hover, .drop.over { border-color: #3b82f6; background: #16162b; }
+  .drop svg { width: 34px; height: 34px; stroke: #3b82f6; margin-bottom: 10px; }
+  .drop p { color: #8888a0; font-size: 14px; }
+  .drop .file { color: #e5e5e5; font-size: 14px; font-weight: 500; }
+
+  .btn {
+    width: 100%; margin-top: 16px; background: #3b82f6; color: #fff;
+    border: none; border-radius: 10px; padding: 12px; font-size: 15px;
+    font-weight: 600; cursor: pointer; transition: opacity .2s;
+  }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn.secondary { background: #26263a; color: #c5c5d5; }
+
+  /* Progress */
+  .progress { display: none; margin-top: 22px; }
+  .progress.show { display: block; }
+  .p-head { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+  .p-pct { font-weight: 600; }
+  .bar { height: 18px; background: #0f0f1a; border-radius: 999px; overflow: hidden; position: relative; }
+  .fill {
+    height: 100%; width: 0%; background: #3b82f6;
+    border-radius: 999px; transition: width .3s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+  }
+  .fill.premium { background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+  .fill span { color: #fff; font-size: 10px; font-weight: 600; padding-right: 8px; }
+  .p-meta { color: #8888a0; font-size: 13px; margin-top: 8px; }
+  .p-eta { color: #666680; font-size: 12px; margin-top: 2px; }
+
+  /* Result */
+  .result { display: none; margin-top: 22px; background: #16162b; border: 1px solid #2a2a44; border-radius: 12px; padding: 18px; }
+  .result.show { display: block; }
+  .result .ok { color: #34d399; font-weight: 600; font-size: 15px; }
+  .linkrow { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+  .linkrow code {
+    flex: 1; background: #0f0f1a; border-radius: 8px; padding: 9px 12px;
+    font-size: 13px; color: #93c5fd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .mini { background: #26263a; color: #c5c5d5; border: none; border-radius: 8px; padding: 9px 12px; font-size: 13px; cursor: pointer; }
+  .mini:hover { background: #33334d; }
+  .expiry { color: #8888a0; font-size: 12px; margin-top: 10px; }
+  .error { display: none; margin-top: 14px; color: #f87171; font-size: 14px; }
+  .error.show { display: block; }
+
+  /* Upgrade banner */
+  .upgrade {
+    display: none; margin-top: 18px; background: #1d1830; border: 1px solid #3a2a5a;
+    border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #c4b5fd;
+    align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .upgrade.show { display: flex; }
+  .upgrade a { background: #8b5cf6; color: #fff; text-decoration: none; padding: 7px 14px; border-radius: 8px; font-weight: 600; font-size: 13px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="card">
+  <span id="badge" class="badge guest">GUEST MODE</span>
+  <h1>Fylo</h1>
+  <p class="sub">Upload &amp; share — the speed of your plan.</p>
+
+  <button class="login-toggle" id="loginToggle">▸ Login for cloud storage</button>
+  <div class="login" id="loginBox">
+    <input id="username" placeholder="Username" autocomplete="username">
+    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+    <div class="row">
+      <button class="btn" style="margin-top:0" id="loginBtn">Login</button>
+      <button class="btn secondary" style="margin-top:0" id="guestBtn">Continue as Guest</button>
+    </div>
+  </div>
+  <p class="who" id="who" style="display:none"></p>
+
+  <div class="drop" id="drop">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V4.5m0 0L7.5 9m4.5-4.5L16.5 9M4.5 19.5h15"/>
+    </svg>
+    <p id="dropText">Drag file here or click to browse</p>
+    <input type="file" id="fileInput" hidden>
+  </div>
+
+  <button class="btn" id="uploadBtn" disabled>Upload &amp; Share</button>
+  <p class="error" id="error"></p>
+
+  <div class="progress" id="progress">
+    <div class="p-head">
+      <span id="pName">file</span>
+      <span class="p-pct" id="pPct">0%</span>
+    </div>
+    <div class="bar"><div class="fill" id="fill"><span id="fillPct"></span></div></div>
+    <p class="p-meta"><span id="pSpeed">0 MB/s</span><span id="pCap"></span> • transferred <span id="pDone">0 B</span> of <span id="pTotal">?</span></p>
+    <p class="p-eta" id="pEta"></p>
+  </div>
+
+  <div class="result" id="result">
+    <p class="ok">✓ Upload complete!</p>
+    <div class="linkrow">
+      <code id="shareLink"></code>
+      <button class="mini" id="copyBtn">Copy</button>
+      <button class="mini" id="openBtn">Open</button>
+    </div>
+    <p class="expiry" id="expiryNote"></p>
+  </div>
+
+  <div class="upgrade" id="upgrade">
+    <span>⚡ Upload at full speed + 500 GB storage with Premium</span>
+    <a href="#" onclick="alert('Premium coming soon'); return false;">Upgrade</a>
+  </div>
+</div>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+let plan = null;          // /api/v1/plan payload, null = guest
+let selectedFile = null;
+let eventSource = null;
+
+const formatBytes = (b) =>
+  b >= 1e9 ? (b / 1e9).toFixed(1) + ' GB'
+  : b >= 1e6 ? (b / 1e6).toFixed(1) + ' MB'
+  : b >= 1e3 ? (b / 1e3).toFixed(1) + ' KB'
+  : b + ' B';
+
+const formatEta = (s) => {
+  if (s == null || s < 0) return '';
+  if (s < 5) return '< 5 seconds remaining';
+  if (s < 60) return Math.round(s) + ' seconds remaining';
+  return Math.floor(s / 60) + ' min ' + Math.round(s % 60) + ' sec remaining';
+};
+
+const authHeader = () => {
+  const t = localStorage.getItem('air_token');
+  return t ? { 'Authorization': 'Bearer ' + t } : {};
+};
+
+// ── Plan badge ────────────────────────────────────────────────────────
+function updateBadge() {
+  const badge = $('badge');
+  if (!plan) {
+    badge.className = 'badge guest';
+    badge.textContent = 'GUEST MODE';
+    $('upgrade').classList.remove('show');
+    return;
+  }
+  const premium = plan.tier === 'PREMIUM';
+  badge.className = 'badge ' + (premium ? 'premium' : 'free');
+  badge.textContent = plan.tier + ' • ' + plan.entitlements.uploadSpeedLabel;
+}
+
+async function loadPlan() {
+  try {
+    const r = await fetch('/api/v1/plan', { headers: authHeader() });
+    plan = r.ok ? await r.json() : null;
+  } catch { plan = null; }
+  if (!plan) localStorage.removeItem('fylo_token');
+  updateBadge();
+  const user = localStorage.getItem('fylo_user');
+  $('who').style.display = plan ? 'block' : 'none';
+  $('loginToggle').style.display = plan ? 'none' : 'block';
+  if (plan && user) $('who').innerHTML =
+    'Logged in as <b>@' + user + '</b> · <a id="logout">Logout</a>';
+  const logout = $('logout');
+  if (logout) logout.onclick = () => {
+    localStorage.removeItem('air_token'); localStorage.removeItem('air_user');
+    plan = null; updateBadge(); loadPlan();
+  };
+}
+
+// ── Login ─────────────────────────────────────────────────────────────
+$('loginToggle').onclick = () => $('loginBox').classList.toggle('open');
+$('guestBtn').onclick = () => {
+  localStorage.removeItem('fylo_token');
+  $('loginBox').classList.remove('open');
+  loadPlan();
+};
+$('loginBtn').onclick = async () => {
+  try {
+    const r = await fetch('/api/v1/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: $('username').value, password: $('password').value }),
+    });
+    if (!r.ok) throw new Error((await r.json()).error || 'Login failed');
+    const tokens = await r.json();
+    localStorage.setItem('air_token', tokens.accessToken);
+    localStorage.setItem('air_user', $('username').value.replace(/^@/, '').toLowerCase());
+    $('loginBox').classList.remove('open');
+    await loadPlan();
+    showError('');
+  } catch (e) { showError(e.message); }
+};
+
+// ── File picking ──────────────────────────────────────────────────────
+const drop = $('drop');
+drop.onclick = () => $('fileInput').click();
+drop.ondragover = (e) => { e.preventDefault(); drop.classList.add('over'); };
+drop.ondragleave = () => drop.classList.remove('over');
+drop.ondrop = (e) => {
+  e.preventDefault(); drop.classList.remove('over');
+  if (e.dataTransfer.files[0]) pick(e.dataTransfer.files[0]);
+};
+$('fileInput').onchange = (e) => e.target.files[0] && pick(e.target.files[0]);
+
+function pick(file) {
+  showError('');
+  if (plan) {
+    const ent = plan.entitlements;
+    if (file.size > ent.maxFileBytes) {
+      return showError('File too large. ' + plan.tier + ' plan allows up to ' +
+        formatBytes(ent.maxFileBytes) + '.');
+    }
+    if (plan.usage.storageBytesUsed + file.size > ent.maxStorageBytes) {
+      return showError('Storage limit reached. ' + plan.tier + ' plan: ' +
+        formatBytes(ent.maxStorageBytes) + ' total.');
+    }
+  }
+  selectedFile = file;
+  $('dropText').innerHTML = '<span class="file">' + file.name + '</span><br>' + formatBytes(file.size);
+  $('uploadBtn').disabled = false;
+}
+
+function showError(message) {
+  $('error').textContent = message;
+  $('error').classList.toggle('show', !!message);
+}
+
+// ── Progress rendering (shared by SSE + XHR paths) ────────────────────
+function renderProgress(bytes, total, speedBps, etaSeconds) {
+  const pct = total > 0 ? Math.min(100, bytes * 100 / total) : 0;
+  $('fill').style.width = pct + '%';
+  $('fillPct').textContent = pct > 15 ? pct.toFixed(1) + '%' : '';
+  $('pPct').textContent = pct.toFixed(1) + '%';
+  $('pSpeed').textContent = formatBytes(speedBps) + '/s ';
+  $('pDone').textContent = formatBytes(bytes);
+  $('pTotal').textContent = total > 0 ? formatBytes(total) : '?';
+  $('pEta').textContent = 'ETA: ' + (formatEta(etaSeconds) || 'calculating…');
+}
+
+function startProgressUi(fileName) {
+  $('result').classList.remove('show');
+  $('progress').classList.add('show');
+  $('pName').textContent = fileName;
+  $('fill').className = 'fill' + (plan && plan.tier === 'PREMIUM' ? ' premium' : '');
+  $('pCap').textContent = plan && plan.entitlements.uploadSpeedLabel !== 'Unlimited'
+    ? ' (max ' + plan.entitlements.uploadSpeedLabel + ')' : '';
+  renderProgress(0, selectedFile.size, 0, -1);
+}
+
+// ── Upload ────────────────────────────────────────────────────────────
+$('uploadBtn').onclick = () => {
+  if (!selectedFile) return;
+  $('uploadBtn').disabled = true;
+  $('uploadBtn').textContent = 'Uploading…';
+  startProgressUi(selectedFile.name);
+  (plan ? uploadLink : uploadGuest)(selectedFile);
+};
+
+// Logged in: link share upload + live server-side progress over SSE.
+// The uploadId is generated CLIENT-side so the SSE stream can be opened
+// while the POST is still running.
+function uploadLink(file) {
+  const uploadId = crypto.randomUUID();
+  const form = new FormData();
+  form.append('file', file);
+
+  fetch('/api/v1/links/upload?uploadId=' + uploadId, {
+    method: 'POST', headers: authHeader(), body: form,
+  }).then(async (r) => {
+    if (!r.ok) throw new Error((await r.json()).error || 'Upload failed');
+    return r.json();
+  }).then((link) => {
+    finish('/s/' + link.slug, expiryText(link.expiresAt));
+  }).catch((e) => fail(e.message));
+
+  // Live progress from the server's ingress loop (throttle-aware).
+  eventSource = new EventSource('/api/v1/uploads/' + uploadId + '/progress');
+  eventSource.onmessage = (event) => {
+    const d = JSON.parse(event.data);
+    renderProgress(d.bytesTransferred, d.totalBytes > 0 ? d.totalBytes : file.size,
+      d.speedBps, d.etaSeconds);
+    if (d.status !== 'IN_PROGRESS') { eventSource.close(); eventSource = null; }
+  };
+  eventSource.onerror = () => { if (eventSource) { eventSource.close(); eventSource = null; } };
+}
+
+// Guest: Mode 1 direct share; progress from XHR (client side).
+function uploadGuest(file) {
+  const form = new FormData();
+  form.append('file', file);
+  const xhr = new XMLHttpRequest();
+  const startedAt = Date.now();
+  xhr.open('POST', '/upload');
+  xhr.upload.onprogress = (e) => {
+    if (!e.lengthComputable) return;
+    const speed = e.loaded / Math.max(0.001, (Date.now() - startedAt) / 1000);
+    renderProgress(e.loaded, e.total, speed, (e.total - e.loaded) / Math.max(1, speed));
+  };
+  xhr.onload = () => {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      const share = JSON.parse(xhr.responseText);
+      finish(null, 'Live share — keep this tab open. Code: ' + share.code, share.code);
+    } else fail('Upload failed (' + xhr.status + ')');
+  };
+  xhr.onerror = () => fail('Upload failed');
+  xhr.send(form);
+}
+
+function expiryText(expiresAt) {
+  if (!plan) return '';
+  if (expiresAt >= 9223372036854775000) return 'Link never expires';
+  const days = Math.round((expiresAt - Date.now()) / 86400000);
+  return 'Link expires in ' + days + ' day' + (days === 1 ? '' : 's') +
+    (plan.tier === 'FREE' ? ' (Free plan)' : '');
+}
+
+function finish(link, note, rawText) {
+  $('progress').classList.remove('show');
+  $('result').classList.add('show');
+  const url = link ? window.location.origin + link : rawText;
+  $('shareLink').textContent = url;
+  $('openBtn').style.display = link ? '' : 'none';
+  $('openBtn').onclick = () => window.open(url, '_blank');
+  $('copyBtn').onclick = async () => {
+    await navigator.clipboard.writeText(url);
+    $('copyBtn').textContent = 'Copied!';
+    setTimeout(() => { $('copyBtn').textContent = 'Copy'; }, 2000);
+  };
+  $('expiryNote').textContent = note || '';
+  $('uploadBtn').disabled = false;
+  $('uploadBtn').textContent = 'Upload & Share';
+  if (plan && plan.tier === 'FREE') $('upgrade').classList.add('show');
+  loadPlan(); // refresh usage numbers
+}
+
+function fail(message) {
+  if (eventSource) { eventSource.close(); eventSource = null; }
+  $('progress').classList.remove('show');
+  showError(message);
+  $('uploadBtn').disabled = false;
+  $('uploadBtn').textContent = 'Upload & Share';
+}
+
+loadPlan();
+</script>
+</body>
+</html>

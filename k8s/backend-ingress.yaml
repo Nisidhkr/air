@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: air-ingress
+  namespace: air
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"        # streaming uploads
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"  # long transfers
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    # WebSocket upgrade for /ws/events on the websocket port.
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [api.air.app, air.app]
+      secretName: air-tls
+  rules:
+    - host: api.air.app
+      http:
+        paths:
+          - path: /ws/events
+            pathType: Prefix
+            backend:
+              service: { name: backend-service, port: { number: 9091 } }
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: backend-service, port: { number: 9090 } }
+    - host: air.app
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: backend-service, port: { number: 9090 } }

@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/usr/lib/jvm/java-21-openjdk-amd64/bin/javac -cp /home/nisidh-kumar/nk/PeerLink/target/classes Bench.java)",
+      "Bash(/usr/lib/jvm/java-21-openjdk-amd64/bin/java -Xmx100m -cp .:/home/nisidh-kumar/nk/PeerLink/target/classes Bench)",
+      "Bash(mvn -q package)",
+      "Bash(awk '{print $9, $5}')",
+      "Bash(cat /tmp/peerlink-server.log; echo ---; ss -tlnp 2>/dev/null | grep 8080)",
+      "Read(//tmp/**)",
+      "Bash(rm -f /tmp/smoke-test.bin /tmp/smoke-out.bin /tmp/smoke-tail.bin /tmp/peerlink-server.log && echo cleaned)",
+      "Bash(ip -4 addr show)",
+      "Read(//mnt/wsl/**)",
+      "PowerShell(wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/throttle-commit.sh)"
+    ],
+    "additionalDirectories": [
+      "/tmp"
+    ]
+  }
+}

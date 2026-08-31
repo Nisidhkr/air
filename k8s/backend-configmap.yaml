@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: air-backend-config
+  namespace: air
+data:
+  FYLO_STORAGE: minio
+  FYLO_DATA_DIR: /data
+  REDIS_URL: redis://redis-service:6379
+  S3_ENDPOINT: http://minio-service:9000
+  S3_BUCKET: air

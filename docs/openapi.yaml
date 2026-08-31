@@ -1,0 +1,968 @@
+openapi: 3.1.0
+info:
+  title: Air Unified Platform API
+  version: 2.0.0
+  description: |
+    The ONE API layer of the Air file-sharing platform (all four modes:
+    Direct Share, Nearby Share, Username Share, Link Share).
+
+    * Every route is served by the single unified backend on one port.
+    * Guest modes (Direct, Nearby) need no authentication.
+    * Account modes (Username, Link) use `Authorization: Bearer <accessToken>`.
+    * This file is the Swagger source of truth — load it in Swagger UI /
+      Redoc / Postman as-is.
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:9090
+    description: Local development
+  - url: https://api.air.app
+    description: Production (TLS terminates at the edge proxy)
+
+tags:
+  - name: Authentication
+  - name: Users
+  - name: Devices
+  - name: Discovery
+  - name: Transfers
+  - name: Uploads
+  - name: Downloads
+  - name: Share Links
+  - name: Transfer Requests
+  - name: Notifications
+  - name: History
+  - name: Plans
+  - name: Observability
+
+paths:
+  # ── Authentication ────────────────────────────────────────────────────
+  /api/v1/auth/register:
+    post:
+      tags: [Authentication]
+      summary: Create an account
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterRequest' }
+      responses:
+        '201':
+          description: Account created; tokens issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RegisterResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/auth/login:
+    post:
+      tags: [Authentication]
+      summary: Log in
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Token pair
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenPair' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/auth/refresh:
+    post:
+      tags: [Authentication]
+      summary: Rotate a refresh token
+      description: >
+        Refresh tokens are single-use. A replayed token invalidates the whole
+        session family (replay-attack protection).
+      operationId: refresh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RefreshRequest' }
+      responses:
+        '200':
+          description: New token pair
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenPair' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/v1/auth/logout:
+    post:
+      tags: [Authentication]
+      summary: Invalidate a refresh token
+      operationId: logout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RefreshRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+
+  # ── Users ─────────────────────────────────────────────────────────────
+  /api/v1/users/me:
+    get:
+      tags: [Users]
+      summary: Current user's profile
+      operationId: me
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserProfile' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/v1/users/search:
+    get:
+      tags: [Users]
+      summary: '@username prefix search (with presence)'
+      operationId: searchUsers
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        '200':
+          description: Matching users, online flag included
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/UserProfile' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  # ── Devices & Discovery ──────────────────────────────────────────────
+  /api/v1/devices/trusted:
+    get:
+      tags: [Devices]
+      summary: My trusted devices
+      operationId: trustedDevices
+      responses:
+        '200':
+          description: Trusted device list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DeviceInfo' }
+  /api/v1/devices/{deviceId}/trust:
+    post:
+      tags: [Devices]
+      summary: Trust or revoke trust for a device
+      operationId: setTrust
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trusted: { type: boolean, default: true }
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+  /api/v1/pair/start:
+    post:
+      tags: [Devices]
+      summary: Start QR/code pairing on this device
+      operationId: pairStart
+      responses:
+        '200':
+          description: One-time pairing offer (render payload as QR)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PairingOffer' }
+  /api/v1/pair/complete:
+    post:
+      tags: [Devices]
+      summary: Present a scanned pairing secret (device-to-device)
+      operationId: pairComplete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PairCompleteRequest' }
+      responses:
+        '200':
+          description: Paired; responder identity returned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PairCompleteResponse' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /lan/devices:
+    get:
+      tags: [Discovery]
+      summary: Nearby devices (mDNS/DNS-SD + manual)
+      operationId: lanDevices
+      responses:
+        '200':
+          description: Self identity + discovered devices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  self: { $ref: '#/components/schemas/DeviceInfo' }
+                  devices:
+                    type: array
+                    items: { $ref: '#/components/schemas/DeviceInfo' }
+  /lan/connect:
+    post:
+      tags: [Discovery]
+      summary: Add a device by IP (multicast-free fallback)
+      operationId: lanConnect
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [host]
+              properties:
+                host: { type: string }
+                port: { type: integer, default: 9090 }
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+        '502': { $ref: '#/components/responses/BadGateway' }
+
+  # ── Uploads / Downloads (gateway, guest-capable) ─────────────────────
+  /upload:
+    post:
+      tags: [Uploads]
+      summary: 'Mode 1: upload a file and mint a share code (guest)'
+      operationId: directUpload
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '200':
+          description: Live share created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DirectShare' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /download/{port}:
+    get:
+      tags: [Downloads]
+      summary: Stream a live share through the gateway (Range supported)
+      operationId: directDownload
+      parameters:
+        - name: port
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: token
+          in: query
+          required: true
+          schema: { type: string }
+        - name: Range
+          in: header
+          required: false
+          schema: { type: string, example: bytes=1048576- }
+      responses:
+        '200': { description: Full content stream }
+        '206': { description: Partial content (resume) }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/direct/{code}:
+    get:
+      tags: [Downloads]
+      summary: Resolve a share code / QR payload (guest)
+      operationId: resolveCode
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema: { type: string, example: 61476-1c9dbd8a7d4e0c2275f77552f8d2ec7b }
+      responses:
+        '200':
+          description: Share metadata + connection details
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResolvedShare' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ── Mode 1 rendezvous (backbone §10 route names, guest) ──────────────
+  /api/v1/transfers/direct/initiate:
+    post:
+      tags: [Transfers]
+      summary: 'Mode 1: sender creates a direct-share session (guest)'
+      operationId: directShareInitiate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fileName, fileSizeBytes]
+              properties:
+                fileName: { type: string }
+                fileSizeBytes: { type: integer, format: int64 }
+                checksum: { type: string, description: SHA-256 hex, optional }
+      responses:
+        '200':
+          description: Session created (expires in 10 minutes)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessionId: { type: string, format: uuid }
+                  sessionCode: { type: string, example: ABC123 }
+                  transferToken: { type: string }
+                  expiresAt: { type: integer, format: int64 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+  /api/v1/transfers/direct/join:
+    post:
+      tags: [Transfers]
+      summary: 'Mode 1: receiver joins via the 6-char share code (guest)'
+      operationId: directShareJoin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string, example: ABC123 }
+      responses:
+        '200':
+          description: Joined session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessionId: { type: string, format: uuid }
+                  transferToken: { type: string }
+                  fileName: { type: string }
+                  fileSizeBytes: { type: integer, format: int64 }
+                  senderReady: { type: boolean }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ── Mode 3 backbone route names (aliases of /api/v1/requests) ────────
+  /api/v1/transfers/username/request:
+    post:
+      tags: [Transfer Requests]
+      summary: 'Mode 3: send a file request to @username (backbone route name)'
+      operationId: usernameShareRequest
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [toUsername, port]
+              properties:
+                toUsername: { type: string, example: aman }
+                port: { type: integer, description: Sender's live share port }
+      responses:
+        '201':
+          description: Request created (PENDING)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId: { type: string, format: uuid }
+                  state: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/v1/transfers/username/respond:
+    post:
+      tags: [Transfer Requests]
+      summary: 'Mode 3: accept or reject a request (backbone route name)'
+      operationId: usernameShareRespond
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [requestId, action]
+              properties:
+                requestId: { type: string, format: uuid }
+                action: { type: string, enum: [accept, reject] }
+      responses:
+        '200':
+          description: On accept, the connection details
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AcceptedRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ── Transfers (queue) ─────────────────────────────────────────────────
+  /transfers:
+    get:
+      tags: [Transfers]
+      summary: Transfer queue snapshots (progress, speed, ETA)
+      operationId: listTransfers
+      responses:
+        '200':
+          description: All transfers, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TransferView' }
+  /transfers/{transferId}:
+    post:
+      tags: [Transfers]
+      summary: Pause / resume / cancel a transfer
+      operationId: transferAction
+      parameters:
+        - name: transferId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action: { type: string, enum: [pause, resume, cancel] }
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ── Share Links (mode 4) ──────────────────────────────────────────────
+  /api/v1/links/upload:
+    post:
+      tags: [Share Links]
+      summary: Upload to cloud storage and mint a link
+      operationId: linkUpload
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: expiryDays
+          in: query
+          description: Expiry in days. 0 = never (Premium). Omit for plan default (Free = 2 days).
+          schema: { type: integer }
+        - name: ttlDays
+          in: query
+          deprecated: true
+          description: Deprecated alias of expiryDays.
+          schema: { type: integer }
+        - name: password
+          in: query
+          description: Password-protect the link (Premium).
+          schema: { type: string }
+        - name: maxDownloads
+          in: query
+          description: Download limit, 0 = unlimited (Premium).
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '201':
+          description: Link created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShareLinkView' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/PlanLimit' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/links:
+    get:
+      tags: [Share Links]
+      summary: My links
+      operationId: listLinks
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Links, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ShareLinkView' }
+  /api/v1/links/{slug}:
+    delete:
+      tags: [Share Links]
+      summary: Delete a link and its stored object
+      operationId: deleteLink
+      security: [{ bearerAuth: [] }]
+      parameters: [{ name: slug, in: path, required: true, schema: { type: string } }]
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/v1/links/{slug}/revoke:
+    post:
+      tags: [Share Links]
+      summary: Revoke a link, keeping the record (Premium)
+      operationId: revokeLink
+      security: [{ bearerAuth: [] }]
+      parameters: [{ name: slug, in: path, required: true, schema: { type: string } }]
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+        '403': { $ref: '#/components/responses/PlanLimit' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/v1/links/{slug}/stats:
+    get:
+      tags: [Share Links]
+      summary: Link analytics (Premium)
+      operationId: linkStats
+      security: [{ bearerAuth: [] }]
+      parameters: [{ name: slug, in: path, required: true, schema: { type: string } }]
+      responses:
+        '200':
+          description: Download analytics
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LinkStats' }
+        '403': { $ref: '#/components/responses/PlanLimit' }
+  /s/{slug}:
+    get:
+      tags: [Downloads]
+      summary: Public link download (no auth; Range supported)
+      operationId: linkDownload
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+        - name: pw
+          in: query
+          description: Password for protected links (or X-Link-Password header).
+          schema: { type: string }
+        - name: Range
+          in: header
+          schema: { type: string }
+      responses:
+        '200': { description: Full content stream }
+        '206': { description: Partial content (resume) }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  # ── Transfer Requests (mode 3) ────────────────────────────────────────
+  /api/v1/requests:
+    post:
+      tags: [Transfer Requests]
+      summary: Ask @username to receive a file
+      operationId: createRequest
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [toUsername, port]
+              properties:
+                toUsername: { type: string, example: aman }
+                port: { type: integer, description: Sender's live share port }
+      responses:
+        '201':
+          description: Request created (PENDING)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId: { type: string, format: uuid }
+                  state: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    get:
+      tags: [Transfer Requests]
+      summary: My incoming pending requests
+      operationId: listRequests
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Pending requests (connection details hidden)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/IncomingRequest' }
+  /api/v1/requests/{requestId}:
+    post:
+      tags: [Transfer Requests]
+      summary: Accept or reject a request
+      description: Accepting reveals the sender's port + transfer token to the receiver only.
+      operationId: actOnRequest
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action: { type: string, enum: [accept, reject] }
+      responses:
+        '200':
+          description: On accept, the connection details
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AcceptedRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ── Notifications & History & Plans ───────────────────────────────────
+  /api/v1/notifications:
+    get:
+      tags: [Notifications]
+      summary: Drain my notification queue (also acts as presence heartbeat)
+      operationId: notifications
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Notifications since last drain
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Notification' }
+  /api/v1/history:
+    get:
+      tags: [History]
+      summary: My transfer history
+      operationId: history
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: History entries, newest first (depth is plan-based)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/HistoryEntry' }
+  /api/v1/plan:
+    get:
+      tags: [Plans]
+      summary: My plan, entitlements, and live usage
+      operationId: plan
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Plan snapshot
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanView' }
+  /metrics:
+    get:
+      tags: [Observability]
+      summary: Prometheus scrape endpoint (text exposition 0.0.4)
+      operationId: metrics
+      responses:
+        '200':
+          description: Metrics
+          content:
+            text/plain: {}
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT (HS256, typ=ACCESS, 15 min TTL)
+
+  responses:
+    Ok:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties: { ok: { type: boolean } }
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: Missing/invalid credentials or link password
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: Authenticated but not allowed
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Resource unknown, expired, revoked, or exhausted
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    PlanLimit:
+      description: Request exceeds the caller's plan (code=plan_limit)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/PlanLimitError' }
+    RateLimited:
+      description: Token bucket empty; honor Retry-After
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    BadGateway:
+      description: Peer unreachable
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string, description: Human-readable, user-safe message }
+    PlanLimitError:
+      allOf:
+        - $ref: '#/components/schemas/Error'
+        - type: object
+          properties:
+            code: { type: string, const: plan_limit }
+            limit:
+              type: string
+              description: Machine-readable limit name
+              enum: [max_file_size, max_storage, active_links, link_expiry,
+                     password_links, download_limits, link_analytics,
+                     link_revocation, file_blocked]
+
+    RegisterRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string, pattern: '^[a-z0-9_]{3,20}$' }
+        displayName: { type: string, maxLength: 80 }
+        password: { type: string, minLength: 8, format: password }
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+    RefreshRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken: { type: string }
+    TokenPair:
+      type: object
+      properties:
+        accessToken: { type: string, description: JWT, 15 min }
+        refreshToken: { type: string, description: JWT, 30 days, single-use }
+        accessExpiresInSec: { type: integer }
+    RegisterResponse:
+      type: object
+      properties:
+        user: { $ref: '#/components/schemas/UserProfile' }
+        tokens: { $ref: '#/components/schemas/TokenPair' }
+
+    UserProfile:
+      type: object
+      properties:
+        userId: { type: string, format: uuid }
+        username: { type: string }
+        displayName: { type: string }
+        online: { type: boolean }
+
+    DeviceInfo:
+      type: object
+      properties:
+        deviceId: { type: string }
+        name: { type: string }
+        os: { type: string }
+        deviceType: { type: string }
+        host: { type: string }
+        apiPort: { type: integer }
+        lastSeenEpochMs: { type: integer, format: int64 }
+        online: { type: boolean }
+        trusted: { type: boolean }
+    PairingOffer:
+      type: object
+      properties:
+        pairingId: { type: string, format: uuid }
+        payload: { type: string, example: 'air://pair/<id>/<secret>?device=…&port=9090' }
+        expiresAt: { type: integer, format: int64 }
+    PairCompleteRequest:
+      type: object
+      required: [pairingId, secret, deviceId, name]
+      properties:
+        pairingId: { type: string }
+        secret: { type: string }
+        deviceId: { type: string }
+        name: { type: string }
+        os: { type: string }
+        deviceType: { type: string }
+        apiPort: { type: integer }
+    PairCompleteResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        deviceId: { type: string }
+        name: { type: string }
+        os: { type: string }
+        deviceType: { type: string }
+
+    DirectShare:
+      type: object
+      properties:
+        port: { type: integer }
+        token: { type: string }
+        code: { type: string, example: 61476-1c9dbd8a7d4e0c22 }
+        qr: { type: string, example: air://direct/61476-1c9dbd8a7d4e0c22 }
+        name: { type: string }
+        size: { type: integer, format: int64 }
+    ResolvedShare:
+      type: object
+      properties:
+        name: { type: string }
+        size: { type: integer, format: int64 }
+        port: { type: integer }
+        token: { type: string }
+
+    TransferView:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        direction: { type: string, enum: [SEND, RECEIVE] }
+        status:
+          type: string
+          enum: [QUEUED, ACTIVE, PAUSED, COMPLETED, FAILED, CANCELLED,
+                 AWAITING_APPROVAL, REJECTED]
+        fileName: { type: string }
+        peerName: { type: string }
+        totalBytes: { type: integer, format: int64 }
+        transferredBytes: { type: integer, format: int64 }
+        percent: { type: number }
+        mbPerSec: { type: number }
+        etaSeconds: { type: integer, format: int64 }
+        error: { type: string }
+        createdAtEpochMs: { type: integer, format: int64 }
+
+    ShareLinkView:
+      type: object
+      properties:
+        slug: { type: string }
+        url: { type: string, example: /s/ggn7IkEQ }
+        fileName: { type: string }
+        size: { type: integer, format: int64 }
+        createdAt: { type: integer, format: int64 }
+        expiresAt:
+          type: integer
+          format: int64
+          description: Epoch ms; 9223372036854775807 (Long.MAX_VALUE) = never
+        downloads: { type: integer, format: int64 }
+        protected: { type: boolean }
+        maxDownloads: { type: integer, format: int64, description: 0 = unlimited }
+        revoked: { type: boolean }
+    LinkStats:
+      type: object
+      properties:
+        slug: { type: string }
+        fileName: { type: string }
+        size: { type: integer, format: int64 }
+        downloads: { type: integer, format: int64 }
+        maxDownloads: { type: integer, format: int64 }
+        protected: { type: boolean }
+        revoked: { type: boolean }
+        createdAt: { type: integer, format: int64 }
+        expiresAt: { type: integer, format: int64 }
+
+    IncomingRequest:
+      type: object
+      properties:
+        requestId: { type: string, format: uuid }
+        fromUsername: { type: string }
+        fileName: { type: string }
+        size: { type: integer, format: int64 }
+        createdAt: { type: integer, format: int64 }
+    AcceptedRequest:
+      type: object
+      properties:
+        requestId: { type: string, format: uuid }
+        fileName: { type: string }
+        size: { type: integer, format: int64 }
+        port: { type: integer }
+        token: { type: string }
+
+    Notification:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        type:
+          type: string
+          enum: [transfer_request, request_accepted, request_rejected, link_expiring]
+        data: { type: object, additionalProperties: true }
+        createdAtEpochMs: { type: integer, format: int64 }
+
+    HistoryEntry:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        direction: { type: string, enum: [SEND, RECEIVE] }
+        mode: { type: string, enum: [DIRECT, NEARBY, USERNAME, LINK] }
+        fileName: { type: string }
+        sizeBytes: { type: integer, format: int64 }
+        counterparty: { type: string }
+        status: { type: string }
+        atEpochMs: { type: integer, format: int64 }
+
+    PlanView:
+      type: object
+      properties:
+        tier: { type: string, enum: [FREE, PREMIUM] }
+        entitlements: { $ref: '#/components/schemas/Entitlements' }
+        usage:
+          type: object
+          properties:
+            storageBytesUsed: { type: integer, format: int64 }
+            activeLinks: { type: integer }
+    Entitlements:
+      type: object
+      properties:
+        maxFileBytes: { type: integer, format: int64 }
+        maxStorageBytes: { type: integer, format: int64 }
+        maxActiveLinks: { type: integer }
+        linkExpiryDayOptions: { type: array, items: { type: integer } }
+        customExpiryAllowed: { type: boolean }
+        neverExpireAllowed: { type: boolean }
+        maxLinkTtlDays: { type: integer, format: int64 }
+        passwordProtectedLinks: { type: boolean }
+        downloadLimits: { type: boolean }
+        linkAnalytics: { type: boolean }
+        linkRevocation: { type: boolean }
+        maxConcurrentTransfers: { type: integer }
+        historyEntries: { type: integer }
+        maxTrustedDevices: { type: integer }
+        ecosystemSync: { type: boolean }

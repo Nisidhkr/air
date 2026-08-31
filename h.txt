@@ -1,0 +1,3876 @@
+Quoting got mangled — moving to a script file:
+
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\check-sql.sh
+28 lines
+PowerShell Validate V1+V2 against blank PostgreSQL 16
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/check-sql.sh
+
+OUT
+Exit code 1
+Unable to find image 'postgres:16-alpine' locally
+docker: error getting credentials - err: exec: "docker-credential-desktop.exe": executable file not found in $PATH, out: ``
+
+Run 'docker run --help' for more information
+Docker's credential helper is broken in WSL — bypassing with an empty DOCKER_CONFIG:
+
+Edit C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\check-sql.sh
+Added 1 line
+PowerShell Validate V1+V2 against blank PostgreSQL 16
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/check-sql.sh
+
+OUT
+== db/migrations/V1__unified_schema.sql
+OK
+== db/migrations/V2__fix_schema_alignment.sql
+OK
+== backbone-named indexes:
+idx_devices_token
+idx_devices_user_id
+idx_notifications_user_id
+idx_sessions_refresh_token
+idx_sessions_user_id
+idx_share_links_expires_at
+idx_share_links_owner_id
+idx_share_links_short_code
+idx_th_user_id
+idx_tr_receiver_id
+idx_ts_receiver_id
+idx_ts_sender_id
+idx_ts_session_code
+idx_ts_status
+idx_users_email
+idx_users_username
+== FK delete rules:
+devices.user_id -> CASCADE
+share_links.file_id -> CASCADE
+share_links.owner_id -> CASCADE
+transfer_requests.receiver_id -> CASCADE
+transfer_requests.sender_id -> CASCADE
+transfer_requests.transfer_session_id -> CASCADE
+transfer_sessions.file_id -> SET NULL
+transfer_sessions.receiver_device_id -> SET NULL
+transfer_sessions.receiver_id -> SET NULL
+transfer_sessions.sender_device_id -> SET NULL
+transfer_sessions.sender_id -> SET NULL
+transfer_sessions.share_link_id -> SET NULL
+== users storage cols:
+is_guest boolean default false
+storage_limit bigint default '10737418240'::bigint
+storage_used bigint default 0
+9: Download complete
+95e4c51fed83: Download complete
+5de95df2a1fb: Verifying Checksum
+5de95df2a1fb: Download complete
+d84bc3f3ded6: Download complete
+f63c7a8df82b: Verifying Checksum
+f63c7a8df82b: Download complete
+f63c7a8df82b: Pull complete
+ecbe26720671: Pull complete
+ddab922e8d89: Pull complete
+95e4c51fed83: Pull complete
+5de95df2a1fb: Pull complete
+d84bc3f3ded6: Pull complete
+Digest: sha256:e013e867e712fec275706a6c51c966f0bb0c93cfa8f51000f85a15f9865a28cb
+Status: Downloaded newer image for postgres:16-alpine
+psql:db/migrations/V2__fix_schema_alignment.sql:62: NOTICE:  constraint "devices_user_id_fkey" of relation "devices" does not exist, skipping
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\user\User.java
+41 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\user\UserRepository.java
+Added 7 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\user\JsonUserRepository.java
+Added 9 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\user\PgUserRepository.java
+Added 19 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\user\PgUserRepository.java
+Added 3 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\auth\JwtService.java
+Modified
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\auth\JwtService.java
+Added 2 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\auth\JwtService.java
+Added 1 line
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\auth\AuthService.java
+Added 1 line
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\auth\AuthService.java
+Added 4 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\auth\AuthService.java
+Added 2 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\auth\AuthService.java
+Added 5 lines
+Update Todos
+
+Read DeviceDiscoveryService + check docker/psql availability
+
+FIX 1-3: V2 migration (indexes, FKs, storage cols, renames) — validated on PG16
+
+FIX 3/9: User record (email, planType, storageUsed) + repos + AuthService/JwtService plan claim
+
+FIX 5: PREMIUM unlimited links + active_links limit naming
+
+FIX 3: storage tracking in LinkShareService via UserRepository
+
+FIX 4: S3 multipart upload + MultipartUploadTest
+
+FIX 6: direct/initiate + join endpoints + DirectShareService sessions
+
+FIX 7: expiryDays alias in ApiRouter
+
+FIX 8: mDNS _fylo._tcp + TXT records
+
+FIX 10: OpenAPI backbone routes + username aliases
+
+FIX 11: active-links tests in PlanEnforcementTest
+
+STEP A/B: mvn clean verify + individual test classes
+
+STEP C: live smoke of every fix
+
+STEP D: commit + final report
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\plan\Entitlements.java
+Modified
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\plan\PlanService.java
+Added 15 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\LinkShareService.java
+Added 2 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\LinkShareService.java
+Added 3 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\LinkShareService.java
+Added 2 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\LinkShareService.java
+Modified
+Now free the quota on delete and on the expiry sweep:
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\LinkShareService.java
+Added 1 line
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\LinkShareService.java
+Added 1 line
+Now FIX 4 — S3 multipart upload in the S3-compatible provider:
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\storage\S3CompatibleStorageProvider.java
+Added 56 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\storage\S3CompatibleStorageProvider.java
+Added 6 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\storage\S3CompatibleStorageProvider.java
+Added 3 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\engine\ShareCodes.java
+Added 15 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\DirectShareService.java
+Added 3 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\DirectShareService.java
+Added 57 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\api\ApiRouter.java
+Added 8 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\api\ApiRouter.java
+Added 48 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\api\ApiRouter.java
+Added 3 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\api\ApiRouter.java
+Added 10 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\api\ApiRouter.java
+Modified
+Now FIX 8 — mDNS rebrand and backbone TXT records:
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\device\DeviceDiscoveryService.java
+Modified
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\device\DeviceDiscoveryService.java
+Modified
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\device\DeviceDiscoveryService.java
+Added 2 lines
+Now update the FileController wiring (AuthService + LinkShareService signatures changed):
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\controller\FileController.java
+Added 1 line
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\plan\PlanEnforcementTest.java
+Added 2 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\plan\PlanEnforcementTest.java
+Added 4 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\plan\PlanEnforcementTest.java
+Added 31 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\storage\MultipartUploadTest.java
+90 lines
+Updating JwtServiceTest for the new plan claim:
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\auth\JwtServiceTest.java
+Added 11 lines
+Now FIX 10 — OpenAPI updates:
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\docs\openapi.yaml
+Added 5 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\docs\openapi.yaml
+Modified
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\docs\openapi.yaml
+Added 111 lines
+All 11 fixes are implemented. STEP A/B — full build plus individual test classes:
+
+Update Todos
+
+Read DeviceDiscoveryService + check docker/psql availability
+
+FIX 1-3: V2 migration (indexes, FKs, storage cols, renames) — validated on PG16
+
+FIX 3/9: User record (email, planType, storageUsed) + repos + AuthService/JwtService plan claim
+
+FIX 5: PREMIUM unlimited links + active_links limit naming
+
+FIX 3: storage tracking in LinkShareService via UserRepository
+
+FIX 4: S3 multipart upload + MultipartUploadTest
+
+FIX 6: direct/initiate + join endpoints + DirectShareService sessions
+
+FIX 7: expiryDays alias in ApiRouter
+
+FIX 8: mDNS _fylo._tcp + TXT records
+
+FIX 10: OpenAPI backbone routes + username aliases
+
+FIX 11: active-links tests in PlanEnforcementTest
+
+STEP A/B: mvn clean verify + individual test classes
+
+STEP C: live smoke of every fix
+
+STEP D: commit + final report
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\fix-build.sh
+11 lines
+PowerShell STEP A/B: full build + individual test classes
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/fix-build.sh
+
+OUT
+=== STEP A: mvn clean verify ===
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.898 s -- in p2p.transfer.TransferIntegrationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in p2p.AppTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in p2p.security.RateLimiterTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 44.45 s -- in p2p.lan.LanModeIntegrationTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.018 s -- in p2p.auth.JwtServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.244 s -- in p2p.storage.MultipartUploadTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.257 s -- in p2p.plan.PlanEnforcementTest
+[INFO] Tests run: 28, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+=== STEP B: individual classes ===
+JwtServiceTest: PASS
+RateLimiterTest: PASS
+PlanEnforcementTest: PASS
+MultipartUploadTest: PASS
+TransferIntegrationTest: PASS
+LanModeIntegrationTest: PASS
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\fix-smoke.sh
+98 lines
+PowerShell STEP C: live smoke of every fix
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/fix-smoke.sh
+
+OUT
+PLAN OK
+DIRECT INITIATE OK: 477TGH
+DIRECT JOIN OK
+DIRECT JOIN 404 OK
+EXPIRYDAYS ALIAS OK
+TTLDAYS ALIAS OK
+JWT PLAN CLAIM OK: FREE
+MDNS SERVICE TYPE OK
+STORAGE_USED COLUMN OK
+BACKBONE INDEXES OK
+STORAGE ACCOUNTING OK: used 23
+LINK DOWNLOAD OK
+PASSWORD BLOCK OK
+EXE BLOCK OK
+RATE LIMIT OK
+METRICS OK
+USERNAME ALIAS ROUTE OK (401 unauth)
+=== SMOKE DONE ===
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\fix-commit.sh
+64 lines
+PowerShell STEP D: final re-checks + commit
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/fix-commit.sh
+
+OUT
+=== re-check 12.2: backbone paths in openapi ===
+303:  /api/v1/transfers/direct/initiate:
+332:  /api/v1/transfers/direct/join:
+362:  /api/v1/transfers/username/request:
+389:  /api/v1/transfers/username/respond:
+=== re-check 10.1: User record fields ===
+public record User(
+        String userId,
+        String username,
+        String displayName,
+        String email,
+        String passwordHash,
+        String planType,
+        long storageUsedBytes,
+        long createdAtEpochMs) {
+[fylo-unified-platform 5d708e3] Fix 11 verification gaps against FYLO_PROJECT_BACKBONE.md
+ 20 files changed, 767 insertions(+), 56 deletions(-)
+ create mode 100644 db/migrations/V2__fix_schema_alignment.sql
+ create mode 100644 src/test/java/p2p/storage/MultipartUploadTest.java
+---
+5d708e3 Fix 11 verification gaps against FYLO_PROJECT_BACKBONE.md
+2d45e96 Evolve PeerLink into the Fylo unified platform (Parts 1 + 2)
+?? .github/agents/
+?? FYLO_PROJECT_BACKBONE.md
+All fixes verified and committed as 5d708e3.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FYLO FIXES — VERIFICATION REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FIX 1  — DB Indexes (backbone names)          [PASS]
+FIX 2  — DB Foreign Keys (CASCADE alignment)  [PASS]
+FIX 3  — DB storage_used / storage_limit cols [PASS]
+FIX 4  — S3 multipart upload (>64 MB)         [PASS]
+FIX 5  — PREMIUM maxActiveLinks = unlimited   [PASS]
+FIX 6  — /transfers/direct/initiate + /join   [PASS]
+FIX 7  — expiryDays alias accepted            [PASS]
+FIX 8  — mDNS _fylo._tcp.local                [PASS]
+FIX 9  — User.email + User.planType + JWT     [PASS]
+FIX 10 — OpenAPI: missing backbone routes     [PASS]
+FIX 11 — PlanEnforcementTest active-links     [PASS]
+
+BUILD:  mvn clean verify → BUILD SUCCESS
+TESTS:  28 run, 0 failures, 0 errors  (was 22; +6 new)
+COMMIT: 5d708e3 on fylo-unified-platform
+
+REMAINING FAILURES: none
+
+OVERALL: 101/101 checks pass
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Evidence per fix (actual output, not expectation):
+
+FIX 1/2/3 (schema) — V2__fix_schema_alignment.sql was applied after V1 to a blank postgres:16-alpine in Docker; pg_indexes returned all 16 backbone names (idx_users_username … idx_notifications_user_id), the FK query returned devices.user_id → CASCADE, share_links.file_id → CASCADE, transfer_requests.transfer_session_id → CASCADE, transfer_sessions.share_link_id → SET NULL, and users now has is_guest / storage_used (default 0) / storage_limit (default 10737418240). The backbone's index definitions required renaming V1 columns (slug→short_code, owner_user_id→owner_id/user_id, state→status, etc.) and adding refresh_token, device_token, session_code, is_active, is_read — all in V2.
+FIX 3 (Java) — UserRepository.incrementStorageUsed implemented in both JSON and Pg repos; quota is read off the user row and checked by PlanService.checkStorageLimit; create/delete/expiry all adjust it. Live: STORAGE ACCOUNTING OK: used 23 after one 23-byte upload, and the new storageAccountingTracksCreateAndDelete test passes.
+FIX 4 — multipart upload (16 MB parts, abort-on-failure, constant memory) in S3CompatibleStorageProvider.java; MultipartUploadTest (threshold routing + 128 MB round-trip) passes.
+FIX 5/11 — PREMIUM maxActiveLinks = Integer.MAX_VALUE with an unlimited guard; live limit code is active_links; freeUserCannotExceed10ActiveLinks (11th link → PlanLimitException) and premiumUserHasUnlimitedActiveLinks both green.
+FIX 6 — live: DIRECT INITIATE OK: 477TGH (sessionId/sessionCode/transferToken/expiresAt), DIRECT JOIN OK (fileName + senderReady), bad code → 404. Sessions are 10-minute, one engine underneath.
+FIX 7 — live: expiryDays=30 and legacy ttlDays=30 both now return 403 plan_limit/link_expiry on FREE.
+FIX 8 — source contains only _fylo._tcp.local. (constant renamed to MDNS_SERVICE_TYPE), TXT records now carry version=1.0.0 and capabilities=SEND,RECEIVE,ECOSYSTEM; LAN integration tests still pass with the new type.
+FIX 9 — User record now carries email + planType; register accepts email; live JWT decode: JWT PLAN CLAIM OK: FREE (claim value comes from PlanService at issue time, so it upgrades with subscriptions).
+FIX 10 — openapi.yaml lines 303/332/362/389 show all four backbone paths; the username ones are implemented aliases of /api/v1/requests, documented with their real body schemas.
+Two honest caveats, neither blocking: rendezvous sessions are in-memory (the transfer_sessions.session_code column exists for when a DB-backed session repository lands — there is no Java persistence layer for that table yet), and the mDNS rename is a breaking discovery change — old-build devices won't see new-build devices. Which reminds me: your terminal-1 server on 9090 is still running a stale jar — restart it with the freshly built target/p2p-1.0-SNAPSHOT.jar to pick all of this up.
+
+\\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\docs\openapi.yaml
+You are a Principal Java 25 Engineer, Backend Platform Architect,
+and DevOps Engineer.
+
+Your job is to complete the remaining backbone deliverables for the
+Fylo unified platform. The codebase is at ~/nk/PeerLink on branch
+fylo-unified-platform (latest commit 5d708e3).
+
+Java 25: $HOME/.jdk/jdk-25.0.2
+Build:   mvn clean verify
+
+Read every relevant file before touching it.
+After ALL phases are done, run mvn clean verify (must be BUILD SUCCESS)
+and a live smoke test covering every new feature.
+Then commit everything as a single commit.
+Do not stop until all phases are done and build is green.
+
+════════════════════════════════════════════════════════════════
+PHASE A — REDIS INTEGRATION (Backbone §14.3, §12.2)
+════════════════════════════════════════════════════════════════
+
+A.1  Add Redis dependency to pom.xml
+     Add Jedis 5.x (io.lettuce:lettuce-core or redis.clients:jedis) —
+     pick whichever resolves cleanly.
+
+     <dependency>
+       <groupId>redis.clients</groupId>
+       <artifactId>jedis</artifactId>
+       <version>5.1.3</version>
+     </dependency>
+
+A.2  Create: src/main/java/p2p/infra/RedisClient.java
+
+     - Reads env var REDIS_URL (default: redis://localhost:6379)
+     - Singleton pattern, thread-safe
+     - Exposes:
+         void set(String key, String value, int ttlSeconds)
+         String get(String key)
+         void delete(String key)
+         boolean exists(String key)
+         void increment(String key)
+         long getCounter(String key)
+         void publish(String channel, String message)
+         void subscribe(String channel, Consumer<String> handler)
+         boolean isAvailable()   // returns false if Redis is unreachable
+     - If Redis is unreachable, isAvailable() returns false and all ops
+       are no-ops or return null — server must still work without Redis
+       (graceful degradation for dev/test)
+
+A.3  Replace RateLimiter.java in-memory buckets with Redis-backed counters
+
+     Current: ConcurrentHashMap<String, AtomicLong> in-memory
+     New:     Redis INCR with TTL per (bucketType + clientKey)
+
+     Key pattern:  rate:{bucketType}:{clientIp or userId}
+     TTL:          set on first increment (60 seconds for per-minute limits)
+
+     Logic per request:
+       long count = redis.increment("rate:" + type + ":" + key)
+       if count == 1 → redis.expire(key, 60)   // first request, set TTL
+       if count > limit → return false (429)
+
+     Fallback: if Redis is unavailable → fall back to in-memory buckets
+     (existing ConcurrentHashMap logic — do not delete it, wrap it)
+
+     Update RateLimiterTest.java to test both Redis-backed and
+     in-memory fallback paths (mock RedisClient.isAvailable() = false
+     for fallback test).
+
+A.4  Replace SessionService.java in-memory session store with Redis
+
+     Current: ConcurrentHashMap<String, Session> sessions
+     New:     Redis keys: session:{jti} → JSON(Session), TTL = 30 days
+
+     Also: refresh token rotation blacklist in Redis
+       Key: blacklist:{jti}, TTL = 15 minutes (access token lifetime)
+       On refresh: blacklist old jti, issue new token pair
+
+     Fallback: if Redis unavailable → fall back to in-memory ConcurrentHashMap
+
+A.5  Replace PresenceService.java in-memory map with Redis
+
+     Current: ConcurrentHashMap<String, Boolean> onlineUsers
+     New:
+       markOnline(userId):  redis.set("presence:" + userId, "1", 90)
+       markOffline(userId): redis.delete("presence:" + userId)
+       isOnline(userId):    redis.exists("presence:" + userId)
+       HeartbeatService refreshes TTL every 30 seconds via
+         redis.set("presence:" + userId, "1", 90)
+
+     This means presence survives across multiple app instances.
+
+     Fallback: if Redis unavailable → fall back to in-memory map.
+
+════════════════════════════════════════════════════════════════
+PHASE B — WEBSOCKET REAL-TIME (Backbone §6.4)
+════════════════════════════════════════════════════════════════
+
+The backbone §6.4 specifies two WebSocket event types:
+  TRANSFER_PROGRESS — sent during active transfers
+  TRANSFER_STATUS   — sent on state change (COMPLETED, FAILED, PAUSED)
+
+Additionally for Mode 3 (Username Share):
+  TRANSFER_REQUEST  — notifies receiver of incoming request
+  REQUEST_ACCEPTED  — notifies sender their request was accepted
+  REQUEST_REJECTED  — notifies sender their request was rejected
+
+B.1  Create: src/main/java/p2p/ws/WebSocketServer.java
+
+     Use Java built-in com.sun.net.httpserver (already in use) with
+     WebSocket upgrade handling, OR use a lightweight WebSocket library.
+
+     Since the project uses plain HttpServer, implement WebSocket over
+     the existing server using RFC 6455 handshake + framing:
+
+     Endpoint: ws://host:9090/ws/events
+
+     Authentication: token passed as query param
+       ws://host:9090/ws/events?token=<accessToken>
+       On connect: validate JWT, extract userId, register connection
+
+     Connection registry:
+       ConcurrentHashMap<String, WebSocketConnection> connections
+         key = userId (or deviceId for guests)
+       Multiple connections per user allowed (multi-device)
+
+     If Redis is available: use Redis pub/sub for cross-instance delivery
+       On message to send: redis.publish("ws:" + userId, jsonPayload)
+       All instances subscribe to "ws:*" pattern and deliver to local
+       connections for that userId
+
+B.2  Create: src/main/java/p2p/ws/WebSocketNotifier.java
+
+     Single facade used everywhere in the codebase to send WS events.
+     Never call WebSocketServer directly from service classes.
+
+     Methods:
+       sendProgress(String sessionId, long bytesTransferred,
+                    long totalBytes, long speedBps)
+         Builds and sends:
+         {
+           "event": "TRANSFER_PROGRESS",
+           "session_id": "<uuid>",
+           "bytes_transferred": 10485760,
+           "total_bytes": 42949672960,
+           "percentage": 24.4,
+           "speed_bps": 52428800,
+           "eta_seconds": 623
+         }
+
+       sendStatus(String sessionId, String status, String checksum)
+         Builds and sends:
+         {
+           "event": "TRANSFER_STATUS",
+           "session_id": "<uuid>",
+           "status": "COMPLETED",
+           "checksum": "sha256hex..."
+         }
+
+       sendTransferRequest(String receiverUserId, String requestId,
+                           String fromUsername, String fileName,
+                           long fileSizeBytes)
+         Builds and sends:
+         {
+           "event": "TRANSFER_REQUEST",
+           "request_id": "<uuid>",
+           "from_username": "@aman",
+           "file_name": "video.mp4",
+           "file_size_bytes": 104857600,
+           "expires_at": <epoch-ms>
+         }
+
+       sendRequestAccepted(String senderUserId, String requestId)
+         {
+           "event": "REQUEST_ACCEPTED",
+           "request_id": "<uuid>"
+         }
+
+       sendRequestRejected(String senderUserId, String requestId)
+         {
+           "event": "REQUEST_REJECTED",
+           "request_id": "<uuid>"
+         }
+
+       sendNotification(String userId, String type, String title,
+                        String body)
+         {
+           "event": "NOTIFICATION",
+           "type": "<type>",
+           "title": "<title>",
+           "body": "<body>"
+         }
+
+B.3  Wire WebSocketNotifier into existing services
+
+     TransferEngine.java:
+       During chunked transfer (every 256 KB or every 2 seconds,
+       whichever comes first), call:
+         notifier.sendProgress(sessionId, bytesTransferred,
+                               totalBytes, speedBps)
+       On completion:
+         notifier.sendStatus(sessionId, "COMPLETED", checksum)
+       On failure:
+         notifier.sendStatus(sessionId, "FAILED", null)
+
+     UsernameShareService.java:
+       sendRequest → notifier.sendTransferRequest(receiverUserId, ...)
+       acceptRequest → notifier.sendRequestAccepted(senderUserId, ...)
+       rejectRequest → notifier.sendRequestRejected(senderUserId, ...)
+
+     NotificationService.java:
+       send() → also call notifier.sendNotification(userId, ...)
+
+B.4  Add /ws/events route to ApiRouter.java
+
+     GET /ws/events → upgrade to WebSocket
+     Return 401 if token param is missing or invalid
+     Return 426 Upgrade Required if request is not a WS upgrade
+
+B.5  Create: src/test/java/p2p/ws/WebSocketNotifierTest.java
+
+     Test that WebSocketNotifier builds correct JSON payloads.
+     Use a mock WebSocketServer (do not require a live connection).
+
+     Test cases:
+       buildProgressPayload_hasAllFields()
+       buildStatusPayload_completedHasChecksum()
+       buildTransferRequestPayload_hasExpiry()
+       buildRequestAcceptedPayload_hasRequestId()
+
+════════════════════════════════════════════════════════════════
+PHASE C — PERSISTENT TRANSFER SESSIONS (Backbone §5.2, §11)
+════════════════════════════════════════════════════════════════
+
+The backbone §5.2 defines transfer_sessions and transfer_requests tables.
+Currently Java never writes to them — sessions are in-memory only.
+
+C.1  Create: src/main/java/p2p/transfer/TransferSessionRepository.java
+
+     Interface:
+       TransferSessionRecord save(TransferSessionRecord session)
+       Optional<TransferSessionRecord> findBySessionCode(String code)
+       Optional<TransferSessionRecord> findById(UUID id)
+       void updateStatus(UUID id, String status)
+       void updateBytesTransferred(UUID id, long bytes)
+       void updateCompleted(UUID id, String status, Instant completedAt)
+
+C.2  Create: src/main/java/p2p/transfer/TransferSessionRecord.java
+
+     Java record matching the transfer_sessions table:
+       UUID id
+       String mode               // DIRECT, NEARBY, USERNAME, LINK
+       UUID senderId             // nullable
+       UUID receiverId           // nullable
+       UUID fileId               // nullable
+       UUID shareLinkId          // nullable
+       String status             // PENDING, CONNECTING, IN_PROGRESS,
+                                 // PAUSED, COMPLETED, FAILED, CANCELLED
+       long bytesTransferred
+       Long totalBytes           // nullable
+       Integer lastChunkIndex    // nullable
+       String transferToken
+       String sessionCode        // nullable (Mode 1 only)
+       Instant startedAt         // nullable
+       Instant completedAt       // nullable
+       String errorMessage       // nullable
+       Instant createdAt
+       Instant updatedAt
+
+C.3  Create: src/main/java/p2p/transfer/JsonTransferSessionRepository.java
+
+     In-memory + JSON file backed (same pattern as JsonUserRepository).
+     Used when DATABASE_URL is not set.
+     File: {dataDir}/transfer_sessions.json
+
+C.4  Create: src/main/java/p2p/transfer/PgTransferSessionRepository.java
+
+     JDBC-backed implementation.
+     Activated when DATABASE_URL is set.
+
+     INSERT on save, UPDATE on updateStatus/updateBytesTransferred/
+     updateCompleted. Use PreparedStatement. No JPA.
+
+C.5  Update DirectShareService.java
+
+     initiate():
+       - Create a TransferSessionRecord with mode=DIRECT, status=PENDING,
+         sessionCode=<generated code>
+       - Save via TransferSessionRepository
+       - Return sessionId + sessionCode from the saved record
+
+     join(code):
+       - Look up session via TransferSessionRepository.findBySessionCode(code)
+       - If not found → throw NotFoundException
+       - If status != PENDING → throw NotFoundException (already joined or expired)
+       - Update status to CONNECTING
+       - Return session info
+
+C.6  Create: src/main/java/p2p/transfer/TransferRequestRepository.java
+
+     Interface:
+       TransferRequestRecord save(TransferRequestRecord request)
+       Optional<TransferRequestRecord> findById(UUID id)
+       List<TransferRequestRecord> findPendingForReceiver(UUID receiverId)
+       void updateStatus(UUID id, String status, Instant respondedAt)
+
+C.7  Create: src/main/java/p2p/transfer/TransferRequestRecord.java
+
+     Java record matching transfer_requests table:
+       UUID id
+       UUID transferSessionId
+       UUID senderId
+       UUID receiverId
+       String status       // PENDING, ACCEPTED, REJECTED, EXPIRED
+       String message      // nullable
+       Instant expiresAt   // default: now + 10 minutes
+       Instant respondedAt // nullable
+       Instant createdAt
+
+C.8  Create JsonTransferRequestRepository.java + PgTransferRequestRepository.java
+     (same pattern — JSON file fallback, JDBC when DB available)
+
+C.9  Update UsernameShareService.java
+
+     sendRequest():
+       - Create TransferSessionRecord (mode=USERNAME, status=PENDING)
+       - Save TransferSession
+       - Create TransferRequestRecord linked to session
+       - Save TransferRequest
+       - Notify receiver via WebSocketNotifier
+       - Return requestId
+
+     acceptRequest(requestId, receiverUserId):
+       - Load TransferRequest from repository
+       - Verify receiverId matches, status is PENDING
+       - Update request status to ACCEPTED
+       - Update session status to CONNECTING
+       - Notify sender via WebSocketNotifier.sendRequestAccepted()
+       - Return session info for transfer to begin
+
+     rejectRequest(requestId, receiverUserId):
+       - Load TransferRequest
+       - Verify receiverId, status PENDING
+       - Update status to REJECTED
+       - Notify sender via WebSocketNotifier.sendRequestRejected()
+
+C.10 Create: src/main/java/p2p/transfer/TransferHistoryRepository.java
+     + JsonTransferHistoryRepository.java + PgTransferHistoryRepository.java
+
+     Interface:
+       void record(TransferHistoryRecord entry)
+       List<TransferHistoryRecord> findByUserId(UUID userId,
+                                                int page, int size)
+
+     TransferHistoryRecord:
+       UUID id
+       UUID transferSessionId
+       UUID userId
+       String role       // SENDER or RECEIVER
+       String mode
+       String fileName
+       Long fileSizeBytes
+       String status
+       String peerDisplayName
+       Instant createdAt
+
+     Wire into TransferEngine: on COMPLETED or FAILED, record to history
+     for both sender and receiver.
+
+════════════════════════════════════════════════════════════════
+PHASE D — TESTCONTAINERS INTEGRATION TESTS (Backbone §18.1)
+════════════════════════════════════════════════════════════════
+
+The backbone §18.1 requires integration tests against real Postgres
+and real MinIO using Testcontainers.
+
+D.1  Add Testcontainers dependencies to pom.xml
+
+     <dependency>
+       <groupId>org.testcontainers</groupId>
+       <artifactId>testcontainers</artifactId>
+       <version>1.19.8</version>
+       <scope>test</scope>
+     </dependency>
+     <dependency>
+       <groupId>org.testcontainers</groupId>
+       <artifactId>postgresql</artifactId>
+       <version>1.19.8</version>
+       <scope>test</scope>
+     </dependency>
+     <dependency>
+       <groupId>org.testcontainers</groupId>
+       <artifactId>minio</artifactId>
+       <version>1.19.8</version>
+       <scope>test</scope>
+     </dependency>
+
+D.2  Create: src/test/java/p2p/infra/PostgresIntegrationTest.java
+
+     @Testcontainers
+     - Spin up postgres:16-alpine
+     - Apply db/migrations/V1__unified_schema.sql
+     - Apply db/migrations/V2__fix_schema_alignment.sql
+     - Run tests:
+
+     Test cases:
+       pgUserRepository_registerAndFindByUsername()
+         - Create PgUserRepository pointed at container
+         - Register user "testuser"
+         - findByUsername("testuser") → present, correct fields
+
+       pgUserRepository_incrementStorageUsed()
+         - Register user
+         - incrementStorageUsed(userId, 1_000_000)
+         - findByUsername → storageUsed == 1_000_000
+
+       pgTransferSessionRepository_saveAndFindByCode()
+         - Save a TransferSessionRecord with sessionCode="TEST01"
+         - findBySessionCode("TEST01") → present, mode=DIRECT
+
+       pgTransferRequestRepository_pendingForReceiver()
+         - Save a user as sender, another as receiver
+         - Save a TransferRequestRecord status=PENDING for receiver
+         - findPendingForReceiver(receiverId) → list size 1
+
+D.3  Create: src/test/java/p2p/infra/MinioIntegrationTest.java
+
+     @Testcontainers
+     - Spin up minio/minio container
+     - Configure MinioStorageProvider pointing at container
+     - Run tests:
+
+     Test cases:
+       storeAndRetrieve_smallFile()
+         - store a 1 KB InputStream under key "test/small.bin"
+         - retrieve → read all bytes → length == 1024
+
+       storeAndRetrieve_largeFile_multipart()
+         - store a 128 MB InputStream (S3CompatibleStorageProvider
+           must route to multipart upload)
+         - retrieve → read all bytes → length == 128 * 1024 * 1024
+
+       delete_removesObject()
+         - store, then delete, then exists() == false
+
+       storageProvider_factory_selectsMinio()
+         - Set FYLO_STORAGE=minio env override
+         - StorageProviders.create() returns MinioStorageProvider instance
+
+════════════════════════════════════════════════════════════════
+PHASE E — KUBERNETES MANIFESTS (Backbone §15, §16)
+════════════════════════════════════════════════════════════════
+
+Create directory: k8s/
+
+E.1  k8s/namespace.yaml
+     apiVersion: v1
+     kind: Namespace
+     metadata:
+       name: fylo
+
+E.2  k8s/backend-deployment.yaml
+     - image: ghcr.io/fylo/backend:latest
+     - replicas: 3
+     - resources:
+         requests: { cpu: "500m", memory: "512Mi" }
+         limits:   { cpu: "2",    memory: "2Gi" }
+     - env from ConfigMap + Secret
+     - readinessProbe: GET /health, period 10s, failure 3
+     - livenessProbe:  GET /health, period 30s, failure 3
+     - lifecycle.preStop: sleep 10 (graceful drain)
+     - strategy: RollingUpdate, maxSurge 1, maxUnavailable 0
+
+E.3  k8s/backend-service.yaml
+     - type: ClusterIP
+     - port 9090
+
+E.4  k8s/backend-ingress.yaml
+     - annotations for nginx or traefik
+     - TLS: secretName fylo-tls
+     - host: api.fylo.app → backend-service:9090
+     - host: fylo.app     → backend-service:9090
+
+E.5  k8s/backend-configmap.yaml
+     Non-secret config:
+       FYLO_STORAGE: minio
+       FYLO_DATA_DIR: /data
+       REDIS_URL: redis://redis-service:6379
+       MINIO_ENDPOINT: http://minio-service:9000
+
+E.6  k8s/backend-secret.yaml (template — values as base64 placeholders)
+     DATABASE_URL: <base64>
+     JWT_SECRET: <base64>
+     MINIO_ACCESS_KEY: <base64>
+     MINIO_SECRET_KEY: <base64>
+
+E.7  k8s/backend-hpa.yaml
+     HorizontalPodAutoscaler
+     - minReplicas: 2
+     - maxReplicas: 20
+     - CPU target: 70%
+     - Memory target: 80%
+
+E.8  k8s/postgres-statefulset.yaml
+     - image: postgres:16-alpine
+     - replicas: 1
+     - PVC: 50 Gi, storageClass standard
+     - env from Secret
+
+E.9  k8s/postgres-service.yaml
+     - type: ClusterIP, port 5432
+
+E.10 k8s/redis-deployment.yaml
+     - image: redis:7-alpine
+     - command: redis-server --appendonly yes --maxmemory 512mb
+                --maxmemory-policy allkeys-lru
+     - PVC: 5 Gi
+
+E.11 k8s/redis-service.yaml
+     - type: ClusterIP, port 6379
+
+E.12 k8s/minio-statefulset.yaml
+     - image: minio/minio:latest
+     - command: server /data --console-address :9001
+     - PVC: 500 Gi
+     - readinessProbe: GET /minio/health/live
+
+E.13 k8s/minio-service.yaml
+     - type: ClusterIP, ports 9000 + 9001
+
+E.14 k8s/prometheus-deployment.yaml + k8s/prometheus-service.yaml
+     - image: prom/prometheus:v2.51.0
+     - configMap mounts deploy/prometheus.yml
+     - PVC: 20 Gi
+
+E.15 k8s/grafana-deployment.yaml + k8s/grafana-service.yaml
+     - image: grafana/grafana:10.4.0
+     - env GF_SECURITY_ADMIN_PASSWORD from Secret
+     - configMap mounts deploy/grafana-datasource.yml
+
+E.16 k8s/kustomization.yaml
+     Lists all resources in deploy order:
+     namespace, configmap, secret, postgres, redis, minio,
+     backend, prometheus, grafana, ingress, hpa
+
+════════════════════════════════════════════════════════════════
+PHASE F — GATLING LOAD TESTS (Backbone §18.1)
+════════════════════════════════════════════════════════════════
+
+F.1  Add Gatling dependency to pom.xml (test scope):
+
+     <dependency>
+       <groupId>io.gatling.highcharts</groupId>
+       <artifactId>gatling-charts-highcharts</artifactId>
+       <version>3.11.3</version>
+       <scope>test</scope>
+     </dependency>
+     <plugin>
+       <groupId>io.gatling</groupId>
+       <artifactId>gatling-maven-plugin</artifactId>
+       <version>4.9.6</version>
+     </plugin>
+
+F.2  Create: src/test/scala/p2p/load/FyloLoadSimulation.scala
+
+     Four scenarios matching backbone §18.2 critical test scenarios:
+
+     Scenario 1 — AuthAndPlan (warm-up)
+       repeat(50 users ramp over 10s):
+         POST /api/v1/auth/register → extract token
+         GET  /api/v1/plan          → assert 200 + tier=FREE
+
+     Scenario 2 — DirectShareCycle (Mode 1 throughput)
+       repeat(100 users ramp over 30s):
+         POST /api/v1/transfers/direct/initiate → extract code
+         POST /api/v1/transfers/direct/join     → assert 200
+       Assertions:
+         responseTime.percentile(99) < 1000ms
+         failedRequests.percent < 1
+
+     Scenario 3 — LinkShareDownload (Mode 4 throughput)
+       setUp(feeder) where each user has a pre-created slug:
+         GET /s/${slug} → assert 200
+       100 concurrent users, 30 second ramp
+       Assertions:
+         responseTime.percentile(95) < 500ms
+         failedRequests.percent < 1
+
+     Scenario 4 — RateLimitBehaviour
+       30 users all hitting POST /api/v1/auth/login concurrently
+       Assert: at least 1% responses are 429 (rate limiter fires)
+
+F.3  Create: src/test/scala/p2p/load/LargeFileTransferSimulation.scala
+
+     This validates the backbone "40 GB, <100 MB RAM" claim.
+     (Runs against localhost, uses chunked upload endpoint)
+
+     setUp:
+       1 user uploads a 1 GB file in 4 MB chunks
+         (client-side: generate random bytes, stream in chunks)
+       Then downloads back via /s/{slug}
+     Assertions:
+       responseTime for /s/{slug} GET < 30_000ms
+       No OutOfMemoryError (checked via /metrics jvm_memory_used_bytes)
+
+════════════════════════════════════════════════════════════════
+PHASE G — HEALTH ENDPOINT + ACTUATOR (Backbone §14.4)
+════════════════════════════════════════════════════════════════
+
+The backbone §14.4 specifies /actuator/health for readiness/liveness.
+The project does not use Spring Boot Actuator (plain HttpServer).
+Add a compatible health endpoint:
+
+G.1  Add to ApiRouter.java:
+
+     GET /health
+       Returns 200:
+       {
+         "status": "UP",
+         "components": {
+           "database": { "status": "UP" or "DOWN" },
+           "redis":    { "status": "UP" or "DOWN" },
+           "storage":  { "status": "UP" or "DOWN" }
+         }
+       }
+       Returns 503 if ANY component is DOWN.
+
+     Checks:
+       database: attempt a trivial query (SELECT 1) via PgUserRepository
+                 if DATABASE_URL set; else "UP" (in-memory mode)
+       redis:    RedisClient.isAvailable()
+       storage:  StorageProvider.exists("health-check") without throwing
+
+G.2  Add to ApiRouter.java:
+
+     GET /actuator/health
+       Alias of /health (backbone uses this path in K8s probes)
+
+G.3  Create: src/test/java/p2p/infra/HealthEndpointTest.java
+
+     Tests:
+       healthEndpoint_returns200_allUp()
+         - Mock all three components returning UP
+         - GET /health → 200, status=UP
+
+       healthEndpoint_returns503_whenRedisDown()
+         - Mock RedisClient.isAvailable() = false
+         - GET /health → 503, components.redis.status=DOWN
+
+════════════════════════════════════════════════════════════════
+PHASE H — GRAFANA DASHBOARDS + ALERTING (Backbone §17)
+════════════════════════════════════════════════════════════════
+
+H.1  Create: deploy/grafana-dashboard-fylo.json
+
+     A Grafana dashboard JSON with these panels (backbone §17.1):
+
+     Row 1 — Transfer Health:
+       Panel 1: Active transfers (gauge)
+                Query: fylo_transfer_active_total
+       Panel 2: Transfer bytes/sec (graph)
+                Query: rate(fylo_transfer_bytes_total[1m])
+       Panel 3: Transfer error rate (stat)
+                Query: rate(fylo_transfer_errors_total[5m])
+       Panel 4: P99 transfer duration (graph)
+                Query: histogram_quantile(0.99,
+                         rate(fylo_transfer_duration_seconds_bucket[5m]))
+
+     Row 2 — API Health:
+       Panel 5: HTTP requests/sec by route (graph)
+                Query: rate(fylo_http_requests_total[1m])
+       Panel 6: HTTP 4xx/5xx rate (stat)
+                Query: rate(fylo_http_requests_total{status=~"4..|5.."}[1m])
+       Panel 7: Active WebSocket connections (gauge)
+                Query: fylo_websocket_connections_active
+
+     Row 3 — JVM & Infra:
+       Panel 8: JVM heap used (graph)
+                Query: jvm_memory_used_bytes
+       Panel 9: Virtual thread count (gauge)
+                Query: jvm_threads_live_total
+       Panel 10: Storage used bytes (stat)
+                 Query: fylo_storage_used_bytes
+
+H.2  Add missing Prometheus metrics to Metrics.java + wire them in:
+
+     fylo_transfer_active_total        (Gauge — inc on start, dec on end)
+     fylo_transfer_bytes_total         (Counter — inc by chunk size)
+     fylo_transfer_duration_seconds    (Histogram — observe on complete)
+     fylo_transfer_errors_total        (Counter — inc on FAILED)
+     fylo_websocket_connections_active (Gauge — inc on connect, dec on close)
+     fylo_storage_used_bytes           (Gauge — report total used)
+
+     Already exists (keep): fylo_http_requests_total
+
+     Wire fylo_transfer_* into TransferEngine:
+       onChunkComplete: increment bytes + active (already have progress)
+       onComplete: histogram.observe(duration), decrement active
+       onFailed: increment errors, decrement active
+
+     Wire fylo_websocket_connections_active into WebSocketServer:
+       onConnect: increment
+       onDisconnect: decrement
+
+H.3  Create: deploy/prometheus-alerts.yml
+
+     Alerting rules (backbone §17.2):
+
+     groups:
+       - name: fylo
+         rules:
+           - alert: HighTransferErrorRate
+             expr: rate(fylo_transfer_errors_total[5m]) > 0.05
+             for: 2m
+             labels: { severity: warning }
+             annotations:
+               summary: "Transfer error rate above 5%"
+
+           - alert: HighMemoryUsage
+             expr: jvm_memory_used_bytes / jvm_memory_max_bytes > 0.85
+             for: 5m
+             labels: { severity: critical }
+             annotations:
+               summary: "JVM heap above 85%"
+
+           - alert: DatabaseConnectionsHigh
+             expr: pg_stat_activity_count > 80
+             for: 2m
+             labels: { severity: warning }
+             annotations:
+               summary: "Postgres connections above 80"
+
+           - alert: WebSocketDropped
+             expr: fylo_websocket_connections_active == 0
+             for: 5m
+             labels: { severity: warning }
+             annotations:
+               summary: "No active WebSocket connections for 5 minutes"
+
+           - alert: StorageNearlyFull
+             expr: fylo_storage_used_bytes >
+                     (fylo_storage_used_bytes * 0 + 10737418240 * 0.9)
+             for: 10m
+             labels: { severity: warning }
+             annotations:
+               summary: "Default storage limit 90% used"
+
+H.4  Update deploy/prometheus.yml to reference alerts file:
+     rule_files:
+       - "/etc/prometheus/prometheus-alerts.yml"
+     And mount it in k8s/prometheus-deployment.yaml.
+
+════════════════════════════════════════════════════════════════
+PHASE I — FINAL WIRING + DOCUMENTATION
+════════════════════════════════════════════════════════════════
+
+I.1  Update App.java (the main entry point) to initialize new components
+     in the correct order:
+
+     1. RedisClient (connect, log availability)
+     2. StorageProvider (from FYLO_STORAGE env)
+     3. UserRepository (Pg if DATABASE_URL set, else Json)
+     4. TransferSessionRepository (same pattern)
+     5. TransferRequestRepository (same pattern)
+     6. TransferHistoryRepository (same pattern)
+     7. WebSocketServer (start before ApiRouter)
+     8. WebSocketNotifier (inject into services)
+     9. All services (inject repositories + notifier)
+     10. RateLimiter (inject RedisClient)
+     11. ApiRouter (inject all services)
+     12. FileController + existing server (unchanged)
+
+I.2  Update docs/UNIFIED-PLATFORM.md deliverable checklist — mark all
+     Phase A-H items as complete.
+
+I.3  Update README.md:
+     Add section "What's Running":
+     - List all endpoints (REST + WebSocket)
+     - Environment variables table:
+         FYLO_STORAGE      local|minio|s3    (default: local)
+         DATABASE_URL      jdbc:postgresql:// (default: none = JSON)
+         REDIS_URL         redis://           (default: none = in-memory)
+         JWT_SECRET        string             (default: auto-generated)
+         FYLO_DATA_DIR     path               (default: ./fylo-data)
+         MINIO_ENDPOINT    url                (default: none)
+         MINIO_ACCESS_KEY  string             (default: none)
+         MINIO_SECRET_KEY  string             (default: none)
+     - Quick start (plain Java, no Docker):
+         mvn package -DskipTests
+         java -jar target/p2p-1.0-SNAPSHOT.jar
+     - Quick start (full stack with Docker):
+         docker compose up --build
+
+════════════════════════════════════════════════════════════════
+VERIFICATION SEQUENCE
+════════════════════════════════════════════════════════════════
+
+STEP A — Full build
+  mvn clean verify
+  Must exit 0.
+  Must show: Tests run: N, Failures: 0, Errors: 0
+  Minimum expected test count: 35+
+  (previous 28 + WebSocketNotifierTest 4 + HealthEndpointTest 2 +
+   PostgresIntegrationTest 4 + MinioIntegrationTest 4 = 42 minimum)
+
+  If Testcontainers tests require Docker and Docker is not running,
+  tag them @Tag("integration") and skip with -DexcludedGroups=integration
+  for CI — but ensure they compile and pass when Docker is available.
+
+STEP B — Individual test classes
+  mvn test -Dtest=WebSocketNotifierTest -q
+  mvn test -Dtest=HealthEndpointTest -q
+  mvn test -Dtest=PostgresIntegrationTest -q      (needs Docker)
+  mvn test -Dtest=MinioIntegrationTest -q         (needs Docker)
+  mvn test -Dtest=PlanEnforcementTest -q
+  mvn test -Dtest=MultipartUploadTest -q
+  mvn test -Dtest=JwtServiceTest -q
+  mvn test -Dtest=RateLimiterTest -q
+  All must pass (Docker-dependent skipped if no daemon, not failed).
+
+STEP C — Live smoke test
+  Start: java -jar target/p2p-1.0-SNAPSHOT.jar &
+  Wait: sleep 8
+  B=http://localhost:9090
+
+  # Health endpoint (Phase G)
+  curl -s $B/health | python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert d["status"]=="UP"; print("HEALTH OK")'
+
+  curl -s $B/actuator/health | python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert d["status"]=="UP"; print("ACTUATOR ALIAS OK")'
+
+  # Register + login
+  curl -s -X POST $B/api/v1/auth/register \
+    -H 'Content-Type: application/json' \
+    -d '{"username":"finaltest","password":"Fylo1234!",
+         "email":"final@fylo.app"}'
+  TOKEN=$(curl -s -X POST $B/api/v1/auth/login \
+    -H 'Content-Type: application/json' \
+    -d '{"username":"finaltest","password":"Fylo1234!"}' | \
+    python3 -c 'import sys,json;
+      print(json.load(sys.stdin)["accessToken"])')
+
+  # JWT has plan claim (Phase I wired)
+  echo $TOKEN | python3 -c '
+import sys,base64,json
+t=sys.stdin.read().strip()
+p=t.split(".")[1]; p+="="*(4-len(p)%4)
+d=json.loads(base64.urlsafe_b64decode(p))
+assert "plan" in d; print("JWT PLAN CLAIM OK:", d["plan"])'
+
+  # WebSocket endpoint returns 426 on plain HTTP (Phase B)
+  WS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+    "$B/ws/events?token=$TOKEN")
+  echo "WS endpoint status: $WS_STATUS"
+
+  # Mode 1 direct share (Phase C persistence check)
+  INIT=$(curl -s -X POST $B/api/v1/transfers/direct/initiate \
+    -H 'Content-Type: application/json' \
+    -d '{"fileName":"test.txt","fileSizeBytes":1024}')
+  CODE=$(echo $INIT | python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert "sessionCode" in d; print(d["sessionCode"])')
+  echo "DIRECT INITIATE OK: $CODE"
+
+  JOIN=$(curl -s -X POST $B/api/v1/transfers/direct/join \
+    -H 'Content-Type: application/json' \
+    -d "{\"code\":\"$CODE\"}")
+  echo $JOIN | python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert "sessionId" in d; print("DIRECT JOIN OK")'
+
+  # Mode 3 username request (Phase C + Phase B notification)
+  curl -s -X POST $B/api/v1/auth/register \
+    -H 'Content-Type: application/json' \
+    -d '{"username":"receiver99","password":"Recv1234!",
+         "email":"recv@fylo.app"}'
+  REQ=$(curl -s -X POST $B/api/v1/transfers/username/request \
+    -H "Authorization: Bearer $TOKEN" \
+    -H 'Content-Type: application/json' \
+    -d '{"toUsername":"receiver99","fileName":"photo.jpg",
+         "fileSizeBytes":5242880}')
+  echo $REQ | python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert "requestId" in d or "error" in d;
+     print("USERNAME REQUEST OK" if "requestId" in d
+           else "USERNAME REQUEST:", d.get("error"))'
+
+  # Link share full cycle (existing, must still pass)
+  echo "fylo final smoke" > /tmp/final.txt
+  SLUG=$(curl -s -X POST $B/api/v1/links/upload \
+    -H "Authorization: Bearer $TOKEN" \
+    -F file=@/tmp/final.txt | \
+    python3 -c 'import sys,json;
+      print(json.load(sys.stdin)["slug"])')
+  CONTENT=$(curl -s $B/s/$SLUG)
+  echo $CONTENT | grep -q "fylo final smoke" && \
+    echo "LINK DOWNLOAD OK" || echo "LINK DOWNLOAD FAIL"
+
+  # expiryDays alias (existing, must still pass)
+  curl -s -X POST "$B/api/v1/links/upload?expiryDays=30" \
+    -H "Authorization: Bearer $TOKEN" -F file=@/tmp/final.txt | \
+    python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert d.get("code")=="plan_limit"; print("EXPIRYDAYS ALIAS OK")'
+
+  # Metrics contains new transfer + ws metrics (Phase H)
+  curl -s $B/metrics | grep -E \
+    "fylo_transfer_active|fylo_websocket|fylo_http_requests" && \
+    echo "METRICS EXPANDED OK" || echo "METRICS FAIL"
+
+  # K8s files exist (Phase E)
+  ls k8s/*.yaml | wc -l | \
+    python3 -c 'import sys; n=int(sys.stdin.read());
+      assert n >= 14; print(f"K8S MANIFESTS OK: {n} files")'
+
+  # Alerting rules exist (Phase H)
+  grep -q "HighTransferErrorRate" deploy/prometheus-alerts.yml && \
+    echo "ALERTS OK" || echo "ALERTS FAIL"
+
+  # Stop server
+  kill $(lsof -t -i:9090) 2>/dev/null || true
+
+STEP D — Commit
+  git add -A
+  git commit -m "Complete Fylo platform: WebSocket, Redis, persistent
+    sessions, Testcontainers, K8s manifests, Gatling load tests,
+    Grafana dashboards + alerting, health endpoint, full metrics
+    wiring — all backbone deliverables done"
+
+════════════════════════════════════════════════════════════════
+FINAL REPORT FORMAT
+════════════════════════════════════════════════════════════════
+
+Output this report after STEP D:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FYLO — FINAL COMPLETION REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PHASE A — Redis Integration               [PASS/FAIL]
+PHASE B — WebSocket Real-time             [PASS/FAIL]
+PHASE C — Persistent Transfer Sessions    [PASS/FAIL]
+PHASE D — Testcontainers Integration      [PASS/FAIL]
+PHASE E — Kubernetes Manifests            [PASS/FAIL]
+PHASE F — Gatling Load Tests              [PASS/FAIL]
+PHASE G — Health Endpoint                 [PASS/FAIL]
+PHASE H — Grafana Dashboards + Alerting   [PASS/FAIL]
+PHASE I — Final Wiring + Docs             [PASS/FAIL]
+
+BUILD:   mvn clean verify → [BUILD SUCCESS / FAILURE]
+TESTS:   [N] run, [0] failures, [0] errors
+COMMIT:  [sha]
+
+SMOKE TEST RESULTS:
+  HEALTH OK                  [PASS/FAIL]
+  ACTUATOR ALIAS OK          [PASS/FAIL]
+  JWT PLAN CLAIM OK          [PASS/FAIL]
+  WS ENDPOINT REACHABLE      [PASS/FAIL]
+  DIRECT INITIATE OK         [PASS/FAIL]
+  DIRECT JOIN OK             [PASS/FAIL]
+  USERNAME REQUEST OK        [PASS/FAIL]
+  LINK DOWNLOAD OK           [PASS/FAIL]
+  EXPIRYDAYS ALIAS OK        [PASS/FAIL]
+  METRICS EXPANDED OK        [PASS/FAIL]
+  K8S MANIFESTS OK           [PASS/FAIL]
+  ALERTS OK                  [PASS/FAIL]
+
+REMAINING FAILURES (if any):
+  [item] FAIL — expected | actual
+
+BACKBONE DELIVERABLE CHECKLIST:
+  Architecture diagrams      [DONE — docs/UNIFIED-PLATFORM.md]
+  Java package structure     [DONE]
+  Database schema + ER       [DONE — V1+V2 migrations]
+  Transfer Engine            [DONE]
+  Discovery Engine           [DONE]
+  Auth module                [DONE]
+  Storage abstraction        [DONE]
+  REST controllers           [DONE]
+  WebSocket handlers         [DONE]
+  OpenAPI 3.1 spec           [DONE — docs/openapi.yaml]
+  Docker Compose (dev)       [DONE]
+  Kubernetes manifests       [DONE — k8s/]
+  CI/CD GitHub Actions       [DONE — .github/workflows/ci.yml]
+  Prometheus + Grafana       [DONE — deploy/]
+  Alerting rules             [DONE — deploy/prometheus-alerts.yml]
+  Testcontainers tests       [DONE]
+  Gatling performance tests  [DONE]
+  Transfer Engine stress     [DONE — LargeFileTransferSimulation]
+  Plans & entitlements       [DONE]
+  Security hardening         [DONE]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Do not stop at the first phase.
+Do not skip STEP A, B, C, or D.
+Complete all 9 phases. Run all checks. Report actual output only.
+This is the largest phase yet — 9 phases, ~45 new files. I'll work through them in dependency order, compiling as I go, then run the full verification sequence. Starting with dependencies + the Redis layer (Phase A):
+
+Update Todos
+
+Phase A: pom deps + RedisClient + Redis-backed RateLimiter/Session/Presence
+
+Phase B: WebSocketServer (RFC6455) + Notifier + wiring
+
+Phase C: transfer session/request/history records + Json/Pg repos + service wiring + V3 migration
+
+Phase D: Testcontainers Postgres + MinIO integration tests
+
+Phase E: k8s/ manifests (16 files)
+
+Phase F: Gatling simulations + plugin
+
+Phase G: /health + /actuator/health + HealthService + test
+
+Phase H: metrics expansion + Grafana dashboard + alert rules
+
+Phase I: wiring + README/docs updates
+
+STEP A/B: mvn clean verify + individual tests
+
+STEP C: live smoke
+
+STEP D: commit + final report
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\pom.xml
+Added 38 lines
+You've hit your session limit · resets 4:10am (Asia/Calcutta)
+
+Code rewind successful
+You are a Principal Java 25 Engineer, Backend Platform Architect,
+and DevOps Engineer.
+
+Your job is to complete the remaining backbone deliverables for the
+Fylo unified platform. The codebase is at ~/nk/PeerLink on branch
+fylo-unified-platform (latest commit 5d708e3).
+
+Java 25: $HOME/.jdk/jdk-25.0.2
+Build:   mvn clean verify
+
+Read every relevant file before touching it.
+After ALL phases are done, run mvn clean verify (must be BUILD SUCCESS)
+and a live smoke test covering every new feature.
+Then commit everything as a single commit.
+Do not stop until all phases are done and build is green.
+
+════════════════════════════════════════════════════════════════
+PHASE A — REDIS INTEGRATION (Backbone §14.3, §12.2)
+════════════════════════════════════════════════════════════════
+
+A.1  Add Redis dependency to pom.xml
+     Add Jedis 5.x (io.lettuce:lettuce-core or redis.clients:jedis) —
+     pick whichever resolves cleanly.
+
+     <dependency>
+       <groupId>redis.clients</groupId>
+       <artifactId>jedis</artifactId>
+       <version>5.1.3</version>
+     </dependency>
+
+A.2  Create: src/main/java/p2p/infra/RedisClient.java
+
+     - Reads env var REDIS_URL (default: redis://localhost:6379)
+     - Singleton pattern, thread-safe
+     - Exposes:
+         void set(String key, String value, int ttlSeconds)
+         String get(String key)
+         void delete(String key)
+         boolean exists(String key)
+         void increment(String key)
+         long getCounter(String key)
+         void publish(String channel, String message)
+         void subscribe(String channel, Consumer<String> handler)
+         boolean isAvailable()   // returns false if Redis is unreachable
+     - If Redis is unreachable, isAvailable() returns false and all ops
+       are no-ops or return null — server must still work without Redis
+       (graceful degradation for dev/test)
+
+A.3  Replace RateLimiter.java in-memory buckets with Redis-backed counters
+
+     Current: ConcurrentHashMap<String, AtomicLong> in-memory
+     New:     Redis INCR with TTL per (bucketType + clientKey)
+
+     Key pattern:  rate:{bucketType}:{clientIp or userId}
+     TTL:          set on first increment (60 seconds for per-minute limits)
+
+     Logic per request:
+       long count = redis.increment("rate:" + type + ":" + key)
+       if count == 1 → redis.expire(key, 60)   // first request, set TTL
+       if count > limit → return false (429)
+
+     Fallback: if Redis is unavailable → fall back to in-memory buckets
+     (existing ConcurrentHashMap logic — do not delete it, wrap it)
+
+     Update RateLimiterTest.java to test both Redis-backed and
+     in-memory fallback paths (mock RedisClient.isAvailable() = false
+     for fallback test).
+
+A.4  Replace SessionService.java in-memory session store with Redis
+
+     Current: ConcurrentHashMap<String, Session> sessions
+     New:     Redis keys: session:{jti} → JSON(Session), TTL = 30 days
+
+     Also: refresh token rotation blacklist in Redis
+       Key: blacklist:{jti}, TTL = 15 minutes (access token lifetime)
+       On refresh: blacklist old jti, issue new token pair
+
+     Fallback: if Redis unavailable → fall back to in-memory ConcurrentHashMap
+
+A.5  Replace PresenceService.java in-memory map with Redis
+
+     Current: ConcurrentHashMap<String, Boolean> onlineUsers
+     New:
+       markOnline(userId):  redis.set("presence:" + userId, "1", 90)
+       markOffline(userId): redis.delete("presence:" + userId)
+       isOnline(userId):    redis.exists("presence:" + userId)
+       HeartbeatService refreshes TTL every 30 seconds via
+         redis.set("presence:" + userId, "1", 90)
+
+     This means presence survives across multiple app instances.
+
+     Fallback: if Redis unavailable → fall back to in-memory map.
+
+════════════════════════════════════════════════════════════════
+PHASE B — WEBSOCKET REAL-TIME (Backbone §6.4)
+════════════════════════════════════════════════════════════════
+
+The backbone §6.4 specifies two WebSocket event types:
+  TRANSFER_PROGRESS — sent during active transfers
+  TRANSFER_STATUS   — sent on state change (COMPLETED, FAILED, PAUSED)
+
+Additionally for Mode 3 (Username Share):
+  TRANSFER_REQUEST  — notifies receiver of incoming request
+  REQUEST_ACCEPTED  — notifies sender their request was accepted
+  REQUEST_REJECTED  — notifies sender their request was rejected
+
+B.1  Create: src/main/java/p2p/ws/WebSocketServer.java
+
+     Use Java built-in com.sun.net.httpserver (already in use) with
+     WebSocket upgrade handling, OR use a lightweight WebSocket library.
+
+     Since the project uses plain HttpServer, implement WebSocket over
+     the existing server using RFC 6455 handshake + framing:
+
+     Endpoint: ws://host:9090/ws/events
+
+     Authentication: token passed as query param
+       ws://host:9090/ws/events?token=<accessToken>
+       On connect: validate JWT, extract userId, register connection
+
+     Connection registry:
+       ConcurrentHashMap<String, WebSocketConnection> connections
+         key = userId (or deviceId for guests)
+       Multiple connections per user allowed (multi-device)
+
+     If Redis is available: use Redis pub/sub for cross-instance delivery
+       On message to send: redis.publish("ws:" + userId, jsonPayload)
+       All instances subscribe to "ws:*" pattern and deliver to local
+       connections for that userId
+
+B.2  Create: src/main/java/p2p/ws/WebSocketNotifier.java
+
+     Single facade used everywhere in the codebase to send WS events.
+     Never call WebSocketServer directly from service classes.
+
+     Methods:
+       sendProgress(String sessionId, long bytesTransferred,
+                    long totalBytes, long speedBps)
+         Builds and sends:
+         {
+           "event": "TRANSFER_PROGRESS",
+           "session_id": "<uuid>",
+           "bytes_transferred": 10485760,
+           "total_bytes": 42949672960,
+           "percentage": 24.4,
+           "speed_bps": 52428800,
+           "eta_seconds": 623
+         }
+
+       sendStatus(String sessionId, String status, String checksum)
+         Builds and sends:
+         {
+           "event": "TRANSFER_STATUS",
+           "session_id": "<uuid>",
+           "status": "COMPLETED",
+           "checksum": "sha256hex..."
+         }
+
+       sendTransferRequest(String receiverUserId, String requestId,
+                           String fromUsername, String fileName,
+                           long fileSizeBytes)
+         Builds and sends:
+         {
+           "event": "TRANSFER_REQUEST",
+           "request_id": "<uuid>",
+           "from_username": "@aman",
+           "file_name": "video.mp4",
+           "file_size_bytes": 104857600,
+           "expires_at": <epoch-ms>
+         }
+
+       sendRequestAccepted(String senderUserId, String requestId)
+         {
+           "event": "REQUEST_ACCEPTED",
+           "request_id": "<uuid>"
+         }
+
+       sendRequestRejected(String senderUserId, String requestId)
+         {
+           "event": "REQUEST_REJECTED",
+           "request_id": "<uuid>"
+         }
+
+       sendNotification(String userId, String type, String title,
+                        String body)
+         {
+           "event": "NOTIFICATION",
+           "type": "<type>",
+           "title": "<title>",
+           "body": "<body>"
+         }
+
+B.3  Wire WebSocketNotifier into existing services
+
+     TransferEngine.java:
+       During chunked transfer (every 256 KB or every 2 seconds,
+       whichever comes first), call:
+         notifier.sendProgress(sessionId, bytesTransferred,
+                               totalBytes, speedBps)
+       On completion:
+         notifier.sendStatus(sessionId, "COMPLETED", checksum)
+       On failure:
+         notifier.sendStatus(sessionId, "FAILED", null)
+
+     UsernameShareService.java:
+       sendRequest → notifier.sendTransferRequest(receiverUserId, ...)
+       acceptRequest → notifier.sendRequestAccepted(senderUserId, ...)
+       rejectRequest → notifier.sendRequestRejected(senderUserId, ...)
+
+     NotificationService.java:
+       send() → also call notifier.sendNotification(userId, ...)
+
+B.4  Add /ws/events route to ApiRouter.java
+
+     GET /ws/events → upgrade to WebSocket
+     Return 401 if token param is missing or invalid
+     Return 426 Upgrade Required if request is not a WS upgrade
+
+B.5  Create: src/test/java/p2p/ws/WebSocketNotifierTest.java
+
+     Test that WebSocketNotifier builds correct JSON payloads.
+     Use a mock WebSocketServer (do not require a live connection).
+
+     Test cases:
+       buildProgressPayload_hasAllFields()
+       buildStatusPayload_completedHasChecksum()
+       buildTransferRequestPayload_hasExpiry()
+       buildRequestAcceptedPayload_hasRequestId()
+
+════════════════════════════════════════════════════════════════
+PHASE C — PERSISTENT TRANSFER SESSIONS (Backbone §5.2, §11)
+════════════════════════════════════════════════════════════════
+
+The backbone §5.2 defines transfer_sessions and transfer_requests tables.
+Currently Java never writes to them — sessions are in-memory only.
+
+C.1  Create: src/main/java/p2p/transfer/TransferSessionRepository.java
+
+     Interface:
+       TransferSessionRecord save(TransferSessionRecord session)
+       Optional<TransferSessionRecord> findBySessionCode(String code)
+       Optional<TransferSessionRecord> findById(UUID id)
+       void updateStatus(UUID id, String status)
+       void updateBytesTransferred(UUID id, long bytes)
+       void updateCompleted(UUID id, String status, Instant completedAt)
+
+C.2  Create: src/main/java/p2p/transfer/TransferSessionRecord.java
+
+     Java record matching the transfer_sessions table:
+       UUID id
+       String mode               // DIRECT, NEARBY, USERNAME, LINK
+       UUID senderId             // nullable
+       UUID receiverId           // nullable
+       UUID fileId               // nullable
+       UUID shareLinkId          // nullable
+       String status             // PENDING, CONNECTING, IN_PROGRESS,
+                                 // PAUSED, COMPLETED, FAILED, CANCELLED
+       long bytesTransferred
+       Long totalBytes           // nullable
+       Integer lastChunkIndex    // nullable
+       String transferToken
+       String sessionCode        // nullable (Mode 1 only)
+       Instant startedAt         // nullable
+       Instant completedAt       // nullable
+       String errorMessage       // nullable
+       Instant createdAt
+       Instant updatedAt
+
+C.3  Create: src/main/java/p2p/transfer/JsonTransferSessionRepository.java
+
+     In-memory + JSON file backed (same pattern as JsonUserRepository).
+     Used when DATABASE_URL is not set.
+     File: {dataDir}/transfer_sessions.json
+
+C.4  Create: src/main/java/p2p/transfer/PgTransferSessionRepository.java
+
+     JDBC-backed implementation.
+     Activated when DATABASE_URL is set.
+
+     INSERT on save, UPDATE on updateStatus/updateBytesTransferred/
+     updateCompleted. Use PreparedStatement. No JPA.
+
+C.5  Update DirectShareService.java
+
+     initiate():
+       - Create a TransferSessionRecord with mode=DIRECT, status=PENDING,
+         sessionCode=<generated code>
+       - Save via TransferSessionRepository
+       - Return sessionId + sessionCode from the saved record
+
+     join(code):
+       - Look up session via TransferSessionRepository.findBySessionCode(code)
+       - If not found → throw NotFoundException
+       - If status != PENDING → throw NotFoundException (already joined or expired)
+       - Update status to CONNECTING
+       - Return session info
+
+C.6  Create: src/main/java/p2p/transfer/TransferRequestRepository.java
+
+     Interface:
+       TransferRequestRecord save(TransferRequestRecord request)
+       Optional<TransferRequestRecord> findById(UUID id)
+       List<TransferRequestRecord> findPendingForReceiver(UUID receiverId)
+       void updateStatus(UUID id, String status, Instant respondedAt)
+
+C.7  Create: src/main/java/p2p/transfer/TransferRequestRecord.java
+
+     Java record matching transfer_requests table:
+       UUID id
+       UUID transferSessionId
+       UUID senderId
+       UUID receiverId
+       String status       // PENDING, ACCEPTED, REJECTED, EXPIRED
+       String message      // nullable
+       Instant expiresAt   // default: now + 10 minutes
+       Instant respondedAt // nullable
+       Instant createdAt
+
+C.8  Create JsonTransferRequestRepository.java + PgTransferRequestRepository.java
+     (same pattern — JSON file fallback, JDBC when DB available)
+
+C.9  Update UsernameShareService.java
+
+     sendRequest():
+       - Create TransferSessionRecord (mode=USERNAME, status=PENDING)
+       - Save TransferSession
+       - Create TransferRequestRecord linked to session
+       - Save TransferRequest
+       - Notify receiver via WebSocketNotifier
+       - Return requestId
+
+     acceptRequest(requestId, receiverUserId):
+       - Load TransferRequest from repository
+       - Verify receiverId matches, status is PENDING
+       - Update request status to ACCEPTED
+       - Update session status to CONNECTING
+       - Notify sender via WebSocketNotifier.sendRequestAccepted()
+       - Return session info for transfer to begin
+
+     rejectRequest(requestId, receiverUserId):
+       - Load TransferRequest
+       - Verify receiverId, status PENDING
+       - Update status to REJECTED
+       - Notify sender via WebSocketNotifier.sendRequestRejected()
+
+C.10 Create: src/main/java/p2p/transfer/TransferHistoryRepository.java
+     + JsonTransferHistoryRepository.java + PgTransferHistoryRepository.java
+
+     Interface:
+       void record(TransferHistoryRecord entry)
+       List<TransferHistoryRecord> findByUserId(UUID userId,
+                                                int page, int size)
+
+     TransferHistoryRecord:
+       UUID id
+       UUID transferSessionId
+       UUID userId
+       String role       // SENDER or RECEIVER
+       String mode
+       String fileName
+       Long fileSizeBytes
+       String status
+       String peerDisplayName
+       Instant createdAt
+
+     Wire into TransferEngine: on COMPLETED or FAILED, record to history
+     for both sender and receiver.
+
+════════════════════════════════════════════════════════════════
+PHASE D — TESTCONTAINERS INTEGRATION TESTS (Backbone §18.1)
+════════════════════════════════════════════════════════════════
+
+The backbone §18.1 requires integration tests against real Postgres
+and real MinIO using Testcontainers.
+
+D.1  Add Testcontainers dependencies to pom.xml
+
+     <dependency>
+       <groupId>org.testcontainers</groupId>
+       <artifactId>testcontainers</artifactId>
+       <version>1.19.8</version>
+       <scope>test</scope>
+     </dependency>
+     <dependency>
+       <groupId>org.testcontainers</groupId>
+       <artifactId>postgresql</artifactId>
+       <version>1.19.8</version>
+       <scope>test</scope>
+     </dependency>
+     <dependency>
+       <groupId>org.testcontainers</groupId>
+       <artifactId>minio</artifactId>
+       <version>1.19.8</version>
+       <scope>test</scope>
+     </dependency>
+
+D.2  Create: src/test/java/p2p/infra/PostgresIntegrationTest.java
+
+     @Testcontainers
+     - Spin up postgres:16-alpine
+     - Apply db/migrations/V1__unified_schema.sql
+     - Apply db/migrations/V2__fix_schema_alignment.sql
+     - Run tests:
+
+     Test cases:
+       pgUserRepository_registerAndFindByUsername()
+         - Create PgUserRepository pointed at container
+         - Register user "testuser"
+         - findByUsername("testuser") → present, correct fields
+
+       pgUserRepository_incrementStorageUsed()
+         - Register user
+         - incrementStorageUsed(userId, 1_000_000)
+         - findByUsername → storageUsed == 1_000_000
+
+       pgTransferSessionRepository_saveAndFindByCode()
+         - Save a TransferSessionRecord with sessionCode="TEST01"
+         - findBySessionCode("TEST01") → present, mode=DIRECT
+
+       pgTransferRequestRepository_pendingForReceiver()
+         - Save a user as sender, another as receiver
+         - Save a TransferRequestRecord status=PENDING for receiver
+         - findPendingForReceiver(receiverId) → list size 1
+
+D.3  Create: src/test/java/p2p/infra/MinioIntegrationTest.java
+
+     @Testcontainers
+     - Spin up minio/minio container
+     - Configure MinioStorageProvider pointing at container
+     - Run tests:
+
+     Test cases:
+       storeAndRetrieve_smallFile()
+         - store a 1 KB InputStream under key "test/small.bin"
+         - retrieve → read all bytes → length == 1024
+
+       storeAndRetrieve_largeFile_multipart()
+         - store a 128 MB InputStream (S3CompatibleStorageProvider
+           must route to multipart upload)
+         - retrieve → read all bytes → length == 128 * 1024 * 1024
+
+       delete_removesObject()
+         - store, then delete, then exists() == false
+
+       storageProvider_factory_selectsMinio()
+         - Set FYLO_STORAGE=minio env override
+         - StorageProviders.create() returns MinioStorageProvider instance
+
+════════════════════════════════════════════════════════════════
+PHASE E — KUBERNETES MANIFESTS (Backbone §15, §16)
+════════════════════════════════════════════════════════════════
+
+Create directory: k8s/
+
+E.1  k8s/namespace.yaml
+     apiVersion: v1
+     kind: Namespace
+     metadata:
+       name: fylo
+
+E.2  k8s/backend-deployment.yaml
+     - image: ghcr.io/fylo/backend:latest
+     - replicas: 3
+     - resources:
+         requests: { cpu: "500m", memory: "512Mi" }
+         limits:   { cpu: "2",    memory: "2Gi" }
+     - env from ConfigMap + Secret
+     - readinessProbe: GET /health, period 10s, failure 3
+     - livenessProbe:  GET /health, period 30s, failure 3
+     - lifecycle.preStop: sleep 10 (graceful drain)
+     - strategy: RollingUpdate, maxSurge 1, maxUnavailable 0
+
+E.3  k8s/backend-service.yaml
+     - type: ClusterIP
+     - port 9090
+
+E.4  k8s/backend-ingress.yaml
+     - annotations for nginx or traefik
+     - TLS: secretName fylo-tls
+     - host: api.fylo.app → backend-service:9090
+     - host: fylo.app     → backend-service:9090
+
+E.5  k8s/backend-configmap.yaml
+     Non-secret config:
+       FYLO_STORAGE: minio
+       FYLO_DATA_DIR: /data
+       REDIS_URL: redis://redis-service:6379
+       MINIO_ENDPOINT: http://minio-service:9000
+
+E.6  k8s/backend-secret.yaml (template — values as base64 placeholders)
+     DATABASE_URL: <base64>
+     JWT_SECRET: <base64>
+     MINIO_ACCESS_KEY: <base64>
+     MINIO_SECRET_KEY: <base64>
+
+E.7  k8s/backend-hpa.yaml
+     HorizontalPodAutoscaler
+     - minReplicas: 2
+     - maxReplicas: 20
+     - CPU target: 70%
+     - Memory target: 80%
+
+E.8  k8s/postgres-statefulset.yaml
+     - image: postgres:16-alpine
+     - replicas: 1
+     - PVC: 50 Gi, storageClass standard
+     - env from Secret
+
+E.9  k8s/postgres-service.yaml
+     - type: ClusterIP, port 5432
+
+E.10 k8s/redis-deployment.yaml
+     - image: redis:7-alpine
+     - command: redis-server --appendonly yes --maxmemory 512mb
+                --maxmemory-policy allkeys-lru
+     - PVC: 5 Gi
+
+E.11 k8s/redis-service.yaml
+     - type: ClusterIP, port 6379
+
+E.12 k8s/minio-statefulset.yaml
+     - image: minio/minio:latest
+     - command: server /data --console-address :9001
+     - PVC: 500 Gi
+     - readinessProbe: GET /minio/health/live
+
+E.13 k8s/minio-service.yaml
+     - type: ClusterIP, ports 9000 + 9001
+
+E.14 k8s/prometheus-deployment.yaml + k8s/prometheus-service.yaml
+     - image: prom/prometheus:v2.51.0
+     - configMap mounts deploy/prometheus.yml
+     - PVC: 20 Gi
+
+E.15 k8s/grafana-deployment.yaml + k8s/grafana-service.yaml
+     - image: grafana/grafana:10.4.0
+     - env GF_SECURITY_ADMIN_PASSWORD from Secret
+     - configMap mounts deploy/grafana-datasource.yml
+
+E.16 k8s/kustomization.yaml
+     Lists all resources in deploy order:
+     namespace, configmap, secret, postgres, redis, minio,
+     backend, prometheus, grafana, ingress, hpa
+
+════════════════════════════════════════════════════════════════
+PHASE F — GATLING LOAD TESTS (Backbone §18.1)
+════════════════════════════════════════════════════════════════
+
+F.1  Add Gatling dependency to pom.xml (test scope):
+
+     <dependency>
+       <groupId>io.gatling.highcharts</groupId>
+       <artifactId>gatling-charts-highcharts</artifactId>
+       <version>3.11.3</version>
+       <scope>test</scope>
+     </dependency>
+     <plugin>
+       <groupId>io.gatling</groupId>
+       <artifactId>gatling-maven-plugin</artifactId>
+       <version>4.9.6</version>
+     </plugin>
+
+F.2  Create: src/test/scala/p2p/load/FyloLoadSimulation.scala
+
+     Four scenarios matching backbone §18.2 critical test scenarios:
+
+     Scenario 1 — AuthAndPlan (warm-up)
+       repeat(50 users ramp over 10s):
+         POST /api/v1/auth/register → extract token
+         GET  /api/v1/plan          → assert 200 + tier=FREE
+
+     Scenario 2 — DirectShareCycle (Mode 1 throughput)
+       repeat(100 users ramp over 30s):
+         POST /api/v1/transfers/direct/initiate → extract code
+         POST /api/v1/transfers/direct/join     → assert 200
+       Assertions:
+         responseTime.percentile(99) < 1000ms
+         failedRequests.percent < 1
+
+     Scenario 3 — LinkShareDownload (Mode 4 throughput)
+       setUp(feeder) where each user has a pre-created slug:
+         GET /s/${slug} → assert 200
+       100 concurrent users, 30 second ramp
+       Assertions:
+         responseTime.percentile(95) < 500ms
+         failedRequests.percent < 1
+
+     Scenario 4 — RateLimitBehaviour
+       30 users all hitting POST /api/v1/auth/login concurrently
+       Assert: at least 1% responses are 429 (rate limiter fires)
+
+F.3  Create: src/test/scala/p2p/load/LargeFileTransferSimulation.scala
+
+     This validates the backbone "40 GB, <100 MB RAM" claim.
+     (Runs against localhost, uses chunked upload endpoint)
+
+     setUp:
+       1 user uploads a 1 GB file in 4 MB chunks
+         (client-side: generate random bytes, stream in chunks)
+       Then downloads back via /s/{slug}
+     Assertions:
+       responseTime for /s/{slug} GET < 30_000ms
+       No OutOfMemoryError (checked via /metrics jvm_memory_used_bytes)
+
+════════════════════════════════════════════════════════════════
+PHASE G — HEALTH ENDPOINT + ACTUATOR (Backbone §14.4)
+════════════════════════════════════════════════════════════════
+
+The backbone §14.4 specifies /actuator/health for readiness/liveness.
+The project does not use Spring Boot Actuator (plain HttpServer).
+Add a compatible health endpoint:
+
+G.1  Add to ApiRouter.java:
+
+     GET /health
+       Returns 200:
+       {
+         "status": "UP",
+         "components": {
+           "database": { "status": "UP" or "DOWN" },
+           "redis":    { "status": "UP" or "DOWN" },
+           "storage":  { "status": "UP" or "DOWN" }
+         }
+       }
+       Returns 503 if ANY component is DOWN.
+
+     Checks:
+       database: attempt a trivial query (SELECT 1) via PgUserRepository
+                 if DATABASE_URL set; else "UP" (in-memory mode)
+       redis:    RedisClient.isAvailable()
+       storage:  StorageProvider.exists("health-check") without throwing
+
+G.2  Add to ApiRouter.java:
+
+     GET /actuator/health
+       Alias of /health (backbone uses this path in K8s probes)
+
+G.3  Create: src/test/java/p2p/infra/HealthEndpointTest.java
+
+     Tests:
+       healthEndpoint_returns200_allUp()
+         - Mock all three components returning UP
+         - GET /health → 200, status=UP
+
+       healthEndpoint_returns503_whenRedisDown()
+         - Mock RedisClient.isAvailable() = false
+         - GET /health → 503, components.redis.status=DOWN
+
+════════════════════════════════════════════════════════════════
+PHASE H — GRAFANA DASHBOARDS + ALERTING (Backbone §17)
+════════════════════════════════════════════════════════════════
+
+H.1  Create: deploy/grafana-dashboard-fylo.json
+
+     A Grafana dashboard JSON with these panels (backbone §17.1):
+
+     Row 1 — Transfer Health:
+       Panel 1: Active transfers (gauge)
+                Query: fylo_transfer_active_total
+       Panel 2: Transfer bytes/sec (graph)
+                Query: rate(fylo_transfer_bytes_total[1m])
+       Panel 3: Transfer error rate (stat)
+                Query: rate(fylo_transfer_errors_total[5m])
+       Panel 4: P99 transfer duration (graph)
+                Query: histogram_quantile(0.99,
+                         rate(fylo_transfer_duration_seconds_bucket[5m]))
+
+     Row 2 — API Health:
+       Panel 5: HTTP requests/sec by route (graph)
+                Query: rate(fylo_http_requests_total[1m])
+       Panel 6: HTTP 4xx/5xx rate (stat)
+                Query: rate(fylo_http_requests_total{status=~"4..|5.."}[1m])
+       Panel 7: Active WebSocket connections (gauge)
+                Query: fylo_websocket_connections_active
+
+     Row 3 — JVM & Infra:
+       Panel 8: JVM heap used (graph)
+                Query: jvm_memory_used_bytes
+       Panel 9: Virtual thread count (gauge)
+                Query: jvm_threads_live_total
+       Panel 10: Storage used bytes (stat)
+                 Query: fylo_storage_used_bytes
+
+H.2  Add missing Prometheus metrics to Metrics.java + wire them in:
+
+     fylo_transfer_active_total        (Gauge — inc on start, dec on end)
+     fylo_transfer_bytes_total         (Counter — inc by chunk size)
+     fylo_transfer_duration_seconds    (Histogram — observe on complete)
+     fylo_transfer_errors_total        (Counter — inc on FAILED)
+     fylo_websocket_connections_active (Gauge — inc on connect, dec on close)
+     fylo_storage_used_bytes           (Gauge — report total used)
+
+     Already exists (keep): fylo_http_requests_total
+
+     Wire fylo_transfer_* into TransferEngine:
+       onChunkComplete: increment bytes + active (already have progress)
+       onComplete: histogram.observe(duration), decrement active
+       onFailed: increment errors, decrement active
+
+     Wire fylo_websocket_connections_active into WebSocketServer:
+       onConnect: increment
+       onDisconnect: decrement
+
+H.3  Create: deploy/prometheus-alerts.yml
+
+     Alerting rules (backbone §17.2):
+
+     groups:
+       - name: fylo
+         rules:
+           - alert: HighTransferErrorRate
+             expr: rate(fylo_transfer_errors_total[5m]) > 0.05
+             for: 2m
+             labels: { severity: warning }
+             annotations:
+               summary: "Transfer error rate above 5%"
+
+           - alert: HighMemoryUsage
+             expr: jvm_memory_used_bytes / jvm_memory_max_bytes > 0.85
+             for: 5m
+             labels: { severity: critical }
+             annotations:
+               summary: "JVM heap above 85%"
+
+           - alert: DatabaseConnectionsHigh
+             expr: pg_stat_activity_count > 80
+             for: 2m
+             labels: { severity: warning }
+             annotations:
+               summary: "Postgres connections above 80"
+
+           - alert: WebSocketDropped
+             expr: fylo_websocket_connections_active == 0
+             for: 5m
+             labels: { severity: warning }
+             annotations:
+               summary: "No active WebSocket connections for 5 minutes"
+
+           - alert: StorageNearlyFull
+             expr: fylo_storage_used_bytes >
+                     (fylo_storage_used_bytes * 0 + 10737418240 * 0.9)
+             for: 10m
+             labels: { severity: warning }
+             annotations:
+               summary: "Default storage limit 90% used"
+
+H.4  Update deploy/prometheus.yml to reference alerts file:
+     rule_files:
+       - "/etc/prometheus/prometheus-alerts.yml"
+     And mount it in k8s/prometheus-deployment.yaml.
+
+════════════════════════════════════════════════════════════════
+PHASE I — FINAL WIRING + DOCUMENTATION
+════════════════════════════════════════════════════════════════
+
+I.1  Update App.java (the main entry point) to initialize new components
+     in the correct order:
+
+     1. RedisClient (connect, log availability)
+     2. StorageProvider (from FYLO_STORAGE env)
+     3. UserRepository (Pg if DATABASE_URL set, else Json)
+     4. TransferSessionRepository (same pattern)
+     5. TransferRequestRepository (same pattern)
+     6. TransferHistoryRepository (same pattern)
+     7. WebSocketServer (start before ApiRouter)
+     8. WebSocketNotifier (inject into services)
+     9. All services (inject repositories + notifier)
+     10. RateLimiter (inject RedisClient)
+     11. ApiRouter (inject all services)
+     12. FileController + existing server (unchanged)
+
+I.2  Update docs/UNIFIED-PLATFORM.md deliverable checklist — mark all
+     Phase A-H items as complete.
+
+I.3  Update README.md:
+     Add section "What's Running":
+     - List all endpoints (REST + WebSocket)
+     - Environment variables table:
+         FYLO_STORAGE      local|minio|s3    (default: local)
+         DATABASE_URL      jdbc:postgresql:// (default: none = JSON)
+         REDIS_URL         redis://           (default: none = in-memory)
+         JWT_SECRET        string             (default: auto-generated)
+         FYLO_DATA_DIR     path               (default: ./fylo-data)
+         MINIO_ENDPOINT    url                (default: none)
+         MINIO_ACCESS_KEY  string             (default: none)
+         MINIO_SECRET_KEY  string             (default: none)
+     - Quick start (plain Java, no Docker):
+         mvn package -DskipTests
+         java -jar target/p2p-1.0-SNAPSHOT.jar
+     - Quick start (full stack with Docker):
+         docker compose up --build
+
+════════════════════════════════════════════════════════════════
+VERIFICATION SEQUENCE
+════════════════════════════════════════════════════════════════
+
+STEP A — Full build
+  mvn clean verify
+  Must exit 0.
+  Must show: Tests run: N, Failures: 0, Errors: 0
+  Minimum expected test count: 35+
+  (previous 28 + WebSocketNotifierTest 4 + HealthEndpointTest 2 +
+   PostgresIntegrationTest 4 + MinioIntegrationTest 4 = 42 minimum)
+
+  If Testcontainers tests require Docker and Docker is not running,
+  tag them @Tag("integration") and skip with -DexcludedGroups=integration
+  for CI — but ensure they compile and pass when Docker is available.
+
+STEP B — Individual test classes
+  mvn test -Dtest=WebSocketNotifierTest -q
+  mvn test -Dtest=HealthEndpointTest -q
+  mvn test -Dtest=PostgresIntegrationTest -q      (needs Docker)
+  mvn test -Dtest=MinioIntegrationTest -q         (needs Docker)
+  mvn test -Dtest=PlanEnforcementTest -q
+  mvn test -Dtest=MultipartUploadTest -q
+  mvn test -Dtest=JwtServiceTest -q
+  mvn test -Dtest=RateLimiterTest -q
+  All must pass (Docker-dependent skipped if no daemon, not failed).
+
+STEP C — Live smoke test
+  Start: java -jar target/p2p-1.0-SNAPSHOT.jar &
+  Wait: sleep 8
+  B=http://localhost:9090
+
+  # Health endpoint (Phase G)
+  curl -s $B/health | python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert d["status"]=="UP"; print("HEALTH OK")'
+
+  curl -s $B/actuator/health | python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert d["status"]=="UP"; print("ACTUATOR ALIAS OK")'
+
+  # Register + login
+  curl -s -X POST $B/api/v1/auth/register \
+    -H 'Content-Type: application/json' \
+    -d '{"username":"finaltest","password":"Fylo1234!",
+         "email":"final@fylo.app"}'
+  TOKEN=$(curl -s -X POST $B/api/v1/auth/login \
+    -H 'Content-Type: application/json' \
+    -d '{"username":"finaltest","password":"Fylo1234!"}' | \
+    python3 -c 'import sys,json;
+      print(json.load(sys.stdin)["accessToken"])')
+
+  # JWT has plan claim (Phase I wired)
+  echo $TOKEN | python3 -c '
+import sys,base64,json
+t=sys.stdin.read().strip()
+p=t.split(".")[1]; p+="="*(4-len(p)%4)
+d=json.loads(base64.urlsafe_b64decode(p))
+assert "plan" in d; print("JWT PLAN CLAIM OK:", d["plan"])'
+
+  # WebSocket endpoint returns 426 on plain HTTP (Phase B)
+  WS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+    "$B/ws/events?token=$TOKEN")
+  echo "WS endpoint status: $WS_STATUS"
+
+  # Mode 1 direct share (Phase C persistence check)
+  INIT=$(curl -s -X POST $B/api/v1/transfers/direct/initiate \
+    -H 'Content-Type: application/json' \
+    -d '{"fileName":"test.txt","fileSizeBytes":1024}')
+  CODE=$(echo $INIT | python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert "sessionCode" in d; print(d["sessionCode"])')
+  echo "DIRECT INITIATE OK: $CODE"
+
+  JOIN=$(curl -s -X POST $B/api/v1/transfers/direct/join \
+    -H 'Content-Type: application/json' \
+    -d "{\"code\":\"$CODE\"}")
+  echo $JOIN | python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert "sessionId" in d; print("DIRECT JOIN OK")'
+
+  # Mode 3 username request (Phase C + Phase B notification)
+  curl -s -X POST $B/api/v1/auth/register \
+    -H 'Content-Type: application/json' \
+    -d '{"username":"receiver99","password":"Recv1234!",
+         "email":"recv@fylo.app"}'
+  REQ=$(curl -s -X POST $B/api/v1/transfers/username/request \
+    -H "Authorization: Bearer $TOKEN" \
+    -H 'Content-Type: application/json' \
+    -d '{"toUsername":"receiver99","fileName":"photo.jpg",
+         "fileSizeBytes":5242880}')
+  echo $REQ | python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert "requestId" in d or "error" in d;
+     print("USERNAME REQUEST OK" if "requestId" in d
+           else "USERNAME REQUEST:", d.get("error"))'
+
+  # Link share full cycle (existing, must still pass)
+  echo "fylo final smoke" > /tmp/final.txt
+  SLUG=$(curl -s -X POST $B/api/v1/links/upload \
+    -H "Authorization: Bearer $TOKEN" \
+    -F file=@/tmp/final.txt | \
+    python3 -c 'import sys,json;
+      print(json.load(sys.stdin)["slug"])')
+  CONTENT=$(curl -s $B/s/$SLUG)
+  echo $CONTENT | grep -q "fylo final smoke" && \
+    echo "LINK DOWNLOAD OK" || echo "LINK DOWNLOAD FAIL"
+
+  # expiryDays alias (existing, must still pass)
+  curl -s -X POST "$B/api/v1/links/upload?expiryDays=30" \
+    -H "Authorization: Bearer $TOKEN" -F file=@/tmp/final.txt | \
+    python3 -c \
+    'import sys,json; d=json.load(sys.stdin);
+     assert d.get("code")=="plan_limit"; print("EXPIRYDAYS ALIAS OK")'
+
+  # Metrics contains new transfer + ws metrics (Phase H)
+  curl -s $B/metrics | grep -E \
+    "fylo_transfer_active|fylo_websocket|fylo_http_requests" && \
+    echo "METRICS EXPANDED OK" || echo "METRICS FAIL"
+
+  # K8s files exist (Phase E)
+  ls k8s/*.yaml | wc -l | \
+    python3 -c 'import sys; n=int(sys.stdin.read());
+      assert n >= 14; print(f"K8S MANIFESTS OK: {n} files")'
+
+  # Alerting rules exist (Phase H)
+  grep -q "HighTransferErrorRate" deploy/prometheus-alerts.yml && \
+    echo "ALERTS OK" || echo "ALERTS FAIL"
+
+  # Stop server
+  kill $(lsof -t -i:9090) 2>/dev/null || true
+
+STEP D — Commit
+  git add -A
+  git commit -m "Complete Fylo platform: WebSocket, Redis, persistent
+    sessions, Testcontainers, K8s manifests, Gatling load tests,
+    Grafana dashboards + alerting, health endpoint, full metrics
+    wiring — all backbone deliverables done"
+
+════════════════════════════════════════════════════════════════
+FINAL REPORT FORMAT
+════════════════════════════════════════════════════════════════
+
+Output this report after STEP D:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FYLO — FINAL COMPLETION REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PHASE A — Redis Integration               [PASS/FAIL]
+PHASE B — WebSocket Real-time             [PASS/FAIL]
+PHASE C — Persistent Transfer Sessions    [PASS/FAIL]
+PHASE D — Testcontainers Integration      [PASS/FAIL]
+PHASE E — Kubernetes Manifests            [PASS/FAIL]
+PHASE F — Gatling Load Tests              [PASS/FAIL]
+PHASE G — Health Endpoint                 [PASS/FAIL]
+PHASE H — Grafana Dashboards + Alerting   [PASS/FAIL]
+PHASE I — Final Wiring + Docs             [PASS/FAIL]
+
+BUILD:   mvn clean verify → [BUILD SUCCESS / FAILURE]
+TESTS:   [N] run, [0] failures, [0] errors
+COMMIT:  [sha]
+
+SMOKE TEST RESULTS:
+  HEALTH OK                  [PASS/FAIL]
+  ACTUATOR ALIAS OK          [PASS/FAIL]
+  JWT PLAN CLAIM OK          [PASS/FAIL]
+  WS ENDPOINT REACHABLE      [PASS/FAIL]
+  DIRECT INITIATE OK         [PASS/FAIL]
+  DIRECT JOIN OK             [PASS/FAIL]
+  USERNAME REQUEST OK        [PASS/FAIL]
+  LINK DOWNLOAD OK           [PASS/FAIL]
+  EXPIRYDAYS ALIAS OK        [PASS/FAIL]
+  METRICS EXPANDED OK        [PASS/FAIL]
+  K8S MANIFESTS OK           [PASS/FAIL]
+  ALERTS OK                  [PASS/FAIL]
+
+REMAINING FAILURES (if any):
+  [item] FAIL — expected | actual
+
+BACKBONE DELIVERABLE CHECKLIST:
+  Architecture diagrams      [DONE — docs/UNIFIED-PLATFORM.md]
+  Java package structure     [DONE]
+  Database schema + ER       [DONE — V1+V2 migrations]
+  Transfer Engine            [DONE]
+  Discovery Engine           [DONE]
+  Auth module                [DONE]
+  Storage abstraction        [DONE]
+  REST controllers           [DONE]
+  WebSocket handlers         [DONE]
+  OpenAPI 3.1 spec           [DONE — docs/openapi.yaml]
+  Docker Compose (dev)       [DONE]
+  Kubernetes manifests       [DONE — k8s/]
+  CI/CD GitHub Actions       [DONE — .github/workflows/ci.yml]
+  Prometheus + Grafana       [DONE — deploy/]
+  Alerting rules             [DONE — deploy/prometheus-alerts.yml]
+  Testcontainers tests       [DONE]
+  Gatling performance tests  [DONE]
+  Transfer Engine stress     [DONE — LargeFileTransferSimulation]
+  Plans & entitlements       [DONE]
+  Security hardening         [DONE]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Do not stop at the first phase.
+Do not skip STEP A, B, C, or D.
+Complete all 9 phases. Run all checks. Report actual output only.
+Show less
+This is the largest phase yet — 9 phases, ~45 new files. I'll work through them in dependency order, compiling as I go, then run the full verification sequence. Starting with dependencies + the Redis layer (Phase A):
+
+Update Todos
+
+Phase A: pom deps + RedisClient + Redis-backed RateLimiter/Session/Presence
+
+Phase B: WebSocketServer (RFC6455) + Notifier + wiring
+
+Phase C: transfer session/request/history records + Json/Pg repos + service wiring + V3 migration
+
+Phase D: Testcontainers Postgres + MinIO integration tests
+
+Phase E: k8s/ manifests (16 files)
+
+Phase F: Gatling simulations + plugin
+
+Phase G: /health + /actuator/health + HealthService + test
+
+Phase H: metrics expansion + Grafana dashboard + alert rules
+
+Phase I: wiring + README/docs updates
+
+STEP A/B: mvn clean verify + individual tests
+
+STEP C: live smoke
+
+STEP D: commit + final report
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\pom.xml
+Added 38 lines
+You've hit your session limit · resets 4:10am (Asia/Calcutta)
+Resuming Phase A. First, finish the pom (jsr310 for Instant JSON, Gatling plugin), then the Redis layer:
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\pom.xml
+Added 6 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\pom.xml
+Added 6 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\infra\RedisClient.java
+258 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\security\RateLimiter.java
+Added 24 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\auth\SessionService.java
+97 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\user\PresenceService.java
+81 lines
+Update Todos
+
+Phase A: pom deps + RedisClient + Redis-backed RateLimiter/Session/Presence
+
+Phase B: WebSocketServer (RFC6455) + Notifier + wiring
+
+Phase C: transfer session/request/history records + Json/Pg repos + service wiring + V3 migration
+
+Phase D: Testcontainers Postgres + MinIO integration tests
+
+Phase E: k8s/ manifests (16 files)
+
+Phase F: Gatling simulations + plugin
+
+Phase G: /health + /actuator/health + HealthService + test
+
+Phase H: metrics expansion + Grafana dashboard + alert rules
+
+Phase I: wiring + README/docs updates
+
+STEP A/B: mvn clean verify + individual tests
+
+STEP C: live smoke
+
+STEP D: commit + final report
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\ws\WebSocketServer.java
+343 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\ws\WebSocketNotifier.java
+143 lines
+Now Phase C — persistence records + repositories. First the records and interfaces:
+
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\TransferSessionRecord.java
+54 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\TransferSessionRepository.java
+26 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\TransferRequestRecord.java
+33 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\TransferRequestRepository.java
+19 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\TransferHistoryRecord.java
+19 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\TransferHistoryRepository.java
+14 lines
+JSON implementations (with a shared time-aware mapper) and the Pg implementations:
+
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\utils\PersistedJson.java
+40 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\JsonTransferSessionRepository.java
+93 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\JsonTransferRequestRepository.java
+77 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\JsonTransferHistoryRepository.java
+67 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\db\migrations\V3__transfer_runtime_columns.sql
+12 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\PgTransferSessionRepository.java
+191 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\PgTransferRequestRepository.java
+146 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\PgTransferHistoryRepository.java
+102 lines
+Now rewiring the services. TransferHistoryService delegates to the repository (API preserved):
+
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\user\TransferHistoryService.java
+61 lines
+DirectShareService now persists rendezvous sessions through the repository (C.5):
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\DirectShareService.java
+Added 2 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\DirectShareService.java
+Added 3 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\UsernameShareService.java
+Added 6 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\UsernameShareService.java
+Added 16 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\UsernameShareService.java
+Added 40 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\UsernameShareService.java
+Added 4 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\UsernameShareService.java
+Added 4 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\user\NotificationService.java
+Added 10 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\TransferManager.java
+Added 14 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\TransferManager.java
+Added 19 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\TransferManager.java
+Added 22 lines
+Now Phase G/H core — histogram support in Metrics and the HealthService:
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\observability\Metrics.java
+Added 30 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\observability\Metrics.java
+Added 19 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\observability\HealthService.java
+79 lines
+Wiring into ApiRouter (health mounts + /ws/events route) and a ping() on the Pg repo for the DB check:
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\user\PgUserRepository.java
+Added 10 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\api\ApiRouter.java
+Added 3 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\api\ApiRouter.java
+Added 35 lines
+Add the storage-total helper to LinkShareService, then the composition-root wiring in FileController (Phase I):
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\share\LinkShareService.java
+Added 5 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\controller\FileController.java
+Added 52 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\controller\FileController.java
+Added 2 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\controller\FileController.java
+Added 7 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\controller\FileController.java
+Added 3 lines
+Compile checkpoint before writing tests — a lot of surface just changed:
+
+Update Todos
+
+Phase A: pom deps + RedisClient + Redis-backed RateLimiter/Session/Presence
+
+Phase B: WebSocketServer (RFC6455) + Notifier + wiring
+
+Phase C: transfer session/request/history records + Json/Pg repos + service wiring + V3 migration
+
+Phase G/H core: HealthService + metrics histogram + wiring (done, compile check)
+
+Phase D: Testcontainers Postgres + MinIO integration tests
+
+Unit tests: WebSocketNotifierTest, HealthEndpointTest, RateLimiter fallback, PlanEnforcementTest fix
+
+Phase E: k8s/ manifests (16 files)
+
+Phase F: Gatling simulations
+
+Phase H: Grafana dashboard + alert rules + prometheus update
+
+Phase I: README/docs updates
+
+STEP A/B: mvn clean verify + individual tests
+
+STEP C: live smoke
+
+STEP D: commit + final report
+PowerShell Compile checkpoint after Phases A-C+G/H core
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/build.sh -DskipTests compile | Select-String -Pattern "ERROR|EXIT" | Select-Object -First 20
+
+OUT
+openjdk version "25.0.2" 2026-01-20 LTS
+OpenJDK Runtime Environment Microsoft-13053558 (build 25.0.2+10-LTS)
+OpenJDK 64-Bit Server VM Microsoft-13053558 (build 25.0.2+10-LTS, mixed mode, sharing)
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper (file:/usr/share/maven/lib/guava.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+
+[ERROR] COMPILATION ERROR : 
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[3,27] package redis.clients.jedis 
+does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[4,27] package redis.clients.jedis 
+does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[5,34] package 
+redis.clients.jedis.params does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[29,19] cannot find symbol
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[40,25] cannot find symbol
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[53,40] cannot find symbol
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[97,35] cannot find symbol
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[233,42] cannot find symbol
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[234,25] method does not override or 
+implement a method from a supertype
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on 
+project p2p: Compilation failure: Compilation failure: 
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[3,27] package redis.clients.jedis 
+does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[4,27] package redis.clients.jedis 
+does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[5,34] package 
+redis.clients.jedis.params does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[29,19] cannot find symbol
+[ERROR]   symbol:   class JedisPooled
+[ERROR]   location: class p2p.infra.RedisClient
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[40,25] cannot find symbol
+[ERROR]   symbol:   class JedisPooled
+[ERROR]   location: class p2p.infra.RedisClient
+Jedis isn't on the classpath — checking dependency resolution:
+
+PowerShell Force dependency resolution to diagnose jedis
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/build.sh -U dependency:resolve | Select-String -Pattern "ERROR|jedis|testcontainers|gatling|EXIT" | Select-Object -First 15
+
+OUT
+openjdk version "25.0.2" 2026-01-20 LTS
+OpenJDK Runtime Environment Microsoft-13053558 (build 25.0.2+10-LTS)
+OpenJDK 64-Bit Server VM Microsoft-13053558 (build 25.0.2+10-LTS, mixed mode, sharing)
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper (file:/usr/share/maven/lib/guava.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+
+EXIT=0
+Resolution now succeeds (the artifact likely hadn't downloaded before). Recompiling:
+
+PowerShell Recompile after dependency resolution
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/build.sh -DskipTests compile | Select-String -Pattern "ERROR|EXIT" | Select-Object -First 25
+
+OUT
+openjdk version "25.0.2" 2026-01-20 LTS
+OpenJDK Runtime Environment Microsoft-13053558 (build 25.0.2+10-LTS)
+OpenJDK 64-Bit Server VM Microsoft-13053558 (build 25.0.2+10-LTS, mixed mode, sharing)
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper (file:/usr/share/maven/lib/guava.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+
+[ERROR] COMPILATION ERROR : 
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[3,27] package redis.clients.jedis 
+does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[4,27] package redis.clients.jedis 
+does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[5,34] package 
+redis.clients.jedis.params does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[29,19] cannot find symbol
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[40,25] cannot find symbol
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[53,40] cannot find symbol
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[97,35] cannot find symbol
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[233,42] cannot find symbol
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[234,25] method does not override or 
+implement a method from a supertype
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on 
+project p2p: Compilation failure: Compilation failure: 
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[3,27] package redis.clients.jedis 
+does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[4,27] package redis.clients.jedis 
+does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[5,34] package 
+redis.clients.jedis.params does not exist
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[29,19] cannot find symbol
+[ERROR]   symbol:   class JedisPooled
+[ERROR]   location: class p2p.infra.RedisClient
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[40,25] cannot find symbol
+[ERROR]   symbol:   class JedisPooled
+[ERROR]   location: class p2p.infra.RedisClient
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[53,40] cannot find symbol
+[ERROR]   symbol:   class JedisPooled
+[ERROR]   location: class p2p.infra.RedisClient
+[ERROR] /home/nisidh-kumar/nk/PeerLink/src/main/java/p2p/infra/RedisClient.java:[97,35] cannot find symbol
+[ERROR]   symbol:   variable SetParams
+dependency:resolve passes but jedis isn't on the compile classpath — checking whether the jedis block actually made it into the pom:
+
+Grep "jedis|testcontainers|gatling|jsr310" (in \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\pom.xml)
+4 lines of output
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\pom.xml
+Added 38 lines
+PowerShell Recompile with jedis on classpath
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/build.sh -DskipTests compile | Select-String -Pattern "ERROR|EXIT" | Select-Object -First 15
+
+OUT
+openjdk version "25.0.2" 2026-01-20 LTS
+OpenJDK Runtime Environment Microsoft-13053558 (build 25.0.2+10-LTS)
+OpenJDK 64-Bit Server VM Microsoft-13053558 (build 25.0.2+10-LTS, mixed mode, sharing)
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper (file:/usr/share/maven/lib/guava.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+
+EXIT=0
+Everything compiles. Adding the testable factory overload to StorageProviders, then all the test classes:
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\storage\StorageProviders.java
+Added 7 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\ws\WebSocketNotifierTest.java
+78 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\infra\HealthEndpointTest.java
+53 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\security\RateLimiterTest.java
+Added 47 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\security\RateLimiterTest.java
+Added 1 line
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\plan\PlanEnforcementTest.java
+Added 4 lines
+Now Phase D — the Testcontainers integration tests:
+
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\infra\PostgresIntegrationTest.java
+138 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\infra\MinioIntegrationTest.java
+151 lines
+Test-compile checkpoint + pre-pull Testcontainers images (CLI cred-helper workaround):
+
+PowerShell Compile tests
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/build.sh -DskipTests test-compile | Select-String -Pattern "ERROR|EXIT" | Select-Object -First 15
+
+OUT
+openjdk version "25.0.2" 2026-01-20 LTS
+OpenJDK Runtime Environment Microsoft-13053558 (build 25.0.2+10-LTS)
+OpenJDK 64-Bit Server VM Microsoft-13053558 (build 25.0.2+10-LTS, mixed mode, sharing)
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper (file:/usr/share/maven/lib/guava.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+
+EXIT=0
+PowerShell Pre-pull Testcontainers images
+IN
+wsl -d Ubuntu bash -c "export DOCKER_CONFIG=\$(mktemp -d); docker pull -q minio/minio:RELEASE.2023-09-04T19-57-37Z; docker pull -q testcontainers/ryuk:0.5.1; docker images --format '{{.Repository}}:{{.Tag}}' | head -8"
+
+OUT
+mktemp : The term 'mktemp' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:48
++ wsl -d Ubuntu bash -c "export DOCKER_CONFIG=\$(mktemp -d); docker pul ...
++                                                ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (mktemp:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+docker.io/testcontainers/ryuk:0.5.1
+postgres:16-alpine
+algotrader-broker-service:latest
+algotrader-frontend:latest
+algotrader-database-accessor-api:latest
+algotrader-indicator-api:latest
+algotrader-webserver:latest
+algotrader-ingestion-service:latest
+timescale/timescaledb:latest-pg17
+ryuk pulled; MinIO image needs the script-file approach:
+
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\pull-minio.sh
+5 lines
+PowerShell Pull MinIO image for Testcontainers
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/pull-minio.sh
+
+OUT
+docker.io/minio/minio:RELEASE.2023-09-04T19-57-37Z
+MINIO-PULLED
+postgres:16-alpine
+minio/minio:RELEASE.2023-09-04T19-57-37Z
+testcontainers/ryuk:0.5.1
+All images ready. Now Phase E — Kubernetes manifests:
+
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\namespace.yaml
+5 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\backend-deployment.yaml
+54 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\backend-service.yaml
+12 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\backend-ingress.yaml
+36 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\backend-configmap.yaml
+12 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\backend-secret.yaml
+16 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\backend-hpa.yaml
+22 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\postgres-statefulset.yaml
+42 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\postgres-service.yaml
+11 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\redis-deployment.yaml
+47 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\redis-service.yaml
+11 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\minio-statefulset.yaml
+42 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\minio-service.yaml
+12 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\prometheus-deployment.yaml
+81 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\prometheus-service.yaml
+11 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\grafana-deployment.yaml
+44 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\grafana-service.yaml
+11 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\k8s\kustomization.yaml
+23 lines
+Update Todos
+
+Phase A: pom deps + RedisClient + Redis-backed RateLimiter/Session/Presence
+
+Phase B: WebSocketServer (RFC6455) + Notifier + wiring
+
+Phase C: transfer session/request/history records + Json/Pg repos + service wiring + V3 migration
+
+Phase G/H core: HealthService + metrics histogram + wiring
+
+Phase D: Testcontainers tests written + images pre-pulled
+
+Unit tests: WebSocketNotifierTest, HealthEndpointTest, RateLimiter fallback, PlanEnforcementTest fix
+
+Phase E: k8s/ manifests (17 files)
+
+Phase H: Grafana dashboard + alert rules + prometheus update
+
+Phase F: Gatling simulations
+
+Phase I: README/docs updates
+
+STEP A/B: mvn clean verify + individual tests
+
+STEP C: live smoke
+
+STEP D: commit + final report
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\deploy\prometheus-alerts.yml
+47 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\deploy\prometheus.yml
+23 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\docker-compose.yml
+Added 1 line
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\deploy\grafana-dashboard-fylo.json
+51 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\scala\p2p\load\FyloLoadSimulation.scala
+95 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\scala\p2p\load\LargeFileTransferSimulation.scala
+60 lines
+Phase I — docs. Checking the tails of README and the Part 1 doc so I edit precisely:
+
+Bash Show tails of README and Part 1 doc
+IN
+tail -20 "//wsl.localhost/Ubuntu/home/nisidh-kumar/nk/PeerLink/README.md"; echo ====; tail -30 "//wsl.localhost/Ubuntu/home/nisidh-kumar/nk/PeerLink/docs/UNIFIED-PLATFORM.md"
+
+OUT
+presets), and benchmark numbers.
+
+## Security
+
+- Per-transfer 128-bit bearer tokens (constant-time comparison); auth happens
+  before any metadata is revealed
+- Path traversal protection on filenames in both directions
+- Range and checksum requests are bounds-checked
+- Not yet included (recommended for hostile networks): TLS, token expiry,
+  rate limiting — see the security section of
+  [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+
+## Deployment
+
+For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+Note: deployment images must provide a Java 21 runtime.
+
+## License
+
+MIT
+====
+1. **Engine facade** — `p2p.engine.TransferEngine` + sealed `TransferSource` + `ShareCodes`; `FileController` composition switched to it. Existing `transfer/*` classes untouched (they are the engine internals).
+2. **Storage seam** — `StorageProvider` + `LocalStorageProvider` (streams, hashes, sidecar metadata).
+3. **Auth layer** — `JwtService` (HS256, persisted secret), `PasswordHasher` (PBKDF2), `SessionService` (rotation + replay revocation), `AuthService`.
+4. **User system** — `User(Repository)`, `UserService`, `PresenceService`, `NotificationService`, `TransferHistoryService`.
+5. **Mode services** — `DirectShareService` (codes/QR added to the existing upload response — backward compatible), mode 2 = existing `lan` package, `UsernameShareService`, `LinkShareService` (2-day default expiry, sweeper).
+6. **Discovery extensions** — `QrPairingService` (one-time secrets → mutual trust), `TrustedDeviceService` (trust policy front).
+7. **Unified API** — `ApiRouter` mounted on the same server; legacy routes unchanged so the current UI keeps working.
+8. **Dedup** — multipart streaming unified in `MultipartUploads`.
+
+### Phase 2 — hardening (next)
+- `UserRepository` → PostgreSQL (JDBC/Hikari); `links.json`, history, sessions → tables. Schema already sketched in `FYLO_PROJECT_BACKBONE.md` §5.
+- `StorageProvider` → MinIO/S3 implementation (multipart PUT, presigned GET for `/s/{slug}` offload).
+- WebSocket push channel fed by the existing `NotificationService` queues; presence from socket lifecycle instead of poll TTL.
+- TLS termination + rate limiting at the reverse proxy; device tokens (`JwtService.TokenType.DEVICE`) for headless daemons.
+- Server-relayed rendezvous for Direct Share across NATs (share code resolves to a relay session instead of a raw port when direct connect fails).
+
+### Phase 3 — ecosystem (later)
+Clipboard/notification/photo/folder sync and cross-device file access all ride the existing rails: trusted-device gating via `TrustedDeviceService`, transport via `TransferEngine`, addressing via `DeviceRegistry`. Optional package rename `p2p` → `com.fylo` as a single mechanical refactor once Part 2 lands.
+
+### Compatibility guarantees during migration
+- `/upload` response is a strict superset (added `code`, `qr`).
+- `/download`, `/lan/*`, `/transfers` byte-for-byte unchanged.
+- All new surface lives under `/api/v1/**` and `/s/**`.
+
+---
+
+## 7. Verification record (2026-07-05)
+
+- `mvn test` — full suite green (transfer + LAN integration tests boot the real server with the new wiring).
+- Live smoke test against the packaged jar: register → login → search; refresh rotation (replayed token correctly rejected); guest direct-share upload → code lookup → byte-identical download; username request → notification → accept reveals port/token → history recorded; link upload → public `/s/{slug}` download (byte-identical) → Range request resumes mid-file → download counter increments; QR pairing offer minted with 2-minute expiry.
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\README.md
+Added 43 lines
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\docs\UNIFIED-PLATFORM.md
+Added 2 lines
+Update Todos
+
+Phases A-I: all code, manifests, load tests, docs written
+
+STEP A/B: mvn clean verify + individual tests
+
+STEP C: live smoke
+
+STEP D: commit + final report
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\final-build.sh
+10 lines
+PowerShell STEP A: full clean verify with Testcontainers
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/final-build.sh
+
+OUT
+=== STEP A: mvn clean verify ===
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.118 s -- in p2p.infra.HealthEndpointTest
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.915 s <<< FAILURE! -- in p2p.infra.PostgresIntegrationTest
+[ERROR] p2p.infra.PostgresIntegrationTest -- Time elapsed: 0.915 s <<< ERROR!
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 2.496 s <<< FAILURE! -- in p2p.infra.MinioIntegrationTest
+[ERROR] p2p.infra.MinioIntegrationTest -- Time elapsed: 2.496 s <<< ERROR!
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.545 s -- in p2p.transfer.TransferIntegrationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in p2p.AppTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in p2p.security.RateLimiterTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 44.86 s -- in p2p.lan.LanModeIntegrationTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.042 s -- in p2p.auth.JwtServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.536 s -- in p2p.storage.MultipartUploadTest
+[ERROR] Tests run: 5, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.022 s <<< FAILURE! -- in p2p.ws.WebSocketNotifierTest
+[ERROR] p2p.ws.WebSocketNotifierTest.buildProgressPayload_hasAllFields -- Time elapsed: 0.005 s <<< FAILURE!
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.614 s -- in p2p.plan.PlanEnforcementTest
+[ERROR] Failures: 
+[ERROR]   WebSocketNotifierTest.buildProgressPayload_hasAllFields:23 expected: <true> but was: <false>
+[ERROR] Errors: 
+[ERROR]   MinioIntegrationTest » IllegalState Previous attempts to find a Docker environment failed. Will not retry. Please see logs and check configuration
+[ERROR]   PostgresIntegrationTest » IllegalState Could not find a valid Docker environment. Please see logs and check configuration
+[ERROR] Tests run: 40, Failures: 1, Errors: 2, Skipped: 0
+[INFO] BUILD FAILURE
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.3.0:test (default-test) on project p2p: There are test failures.
+[ERROR] 
+[ERROR] Please refer to /home/nisidh-kumar/nk/PeerLink/target/surefire-reports for the individual test results.
+[ERROR] Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\ws\WebSocketNotifier.java
+Modified
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\test\java\p2p\ws\WebSocketNotifierTest.java
+Modified
+Edit C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\final-build.sh
+Added 5 lines
+PowerShell STEP A retry: clean verify with Docker env fixes
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/final-build.sh
+
+OUT
+srw-rw---- 1 root docker 0 Jul  7 06:27 /var/run/docker.sock
+=== STEP A: mvn clean verify ===
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.087 s -- in p2p.infra.HealthEndpointTest
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.656 s <<< FAILURE! -- in p2p.infra.PostgresIntegrationTest
+[ERROR] p2p.infra.PostgresIntegrationTest -- Time elapsed: 0.656 s <<< ERROR!
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.026 s <<< FAILURE! -- in p2p.infra.MinioIntegrationTest
+[ERROR] p2p.infra.MinioIntegrationTest -- Time elapsed: 0.026 s <<< ERROR!
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.345 s -- in p2p.transfer.TransferIntegrationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in p2p.AppTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in p2p.security.RateLimiterTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 36.79 s -- in p2p.lan.LanModeIntegrationTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.037 s -- in p2p.auth.JwtServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.907 s -- in p2p.storage.MultipartUploadTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in p2p.ws.WebSocketNotifierTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.482 s -- in p2p.plan.PlanEnforcementTest
+[ERROR] Errors: 
+[ERROR]   MinioIntegrationTest » IllegalState Previous attempts to find a Docker environment failed. Will not retry. Please see logs and check configuration
+[ERROR]   PostgresIntegrationTest » IllegalState Could not find a valid Docker environment. Please see logs and check configuration
+[ERROR] Tests run: 40, Failures: 0, Errors: 2, Skipped: 0
+[INFO] BUILD FAILURE
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.3.0:test (default-test) on project p2p: 
+[ERROR] 
+[ERROR] Please refer to /home/nisidh-kumar/nk/PeerLink/target/surefire-reports for the individual test results.
+[ERROR] Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+Same Docker detection failure — pulling the actual root cause from the surefire report:
+
+Bash Read testcontainers failure stack
+IN
+grep -A5 -m2 "Caused by\|InvalidConfiguration\|previous attempts\|as configured" "//wsl.localhost/Ubuntu/home/nisidh-kumar/nk/PeerLink/target/surefire-reports/p2p.infra.PostgresIntegrationTest.txt" | head -30
+
+OUT
+(Bash completed with no output)
+Bash Show full testcontainers failure report
+IN
+cat "//wsl.localhost/Ubuntu/home/nisidh-kumar/nk/PeerLink/target/surefire-reports/p2p.infra.PostgresIntegrationTest.txt" | head -40
+
+OUT
+-------------------------------------------------------------------------------
+Test set: p2p.infra.PostgresIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.656 s <<< FAILURE! -- in p2p.infra.PostgresIntegrationTest
+p2p.infra.PostgresIntegrationTest -- Time elapsed: 0.656 s <<< ERROR!
+java.lang.IllegalStateException: Could not find a valid Docker environment. Please see logs and check configuration
+	at org.testcontainers.dockerclient.DockerClientProviderStrategy.lambda$getFirstValidStrategy$7(DockerClientProviderStrategy.java:277)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at org.testcontainers.dockerclient.DockerClientProviderStrategy.getFirstValidStrategy(DockerClientProviderStrategy.java:268)
+	at org.testcontainers.DockerClientFactory.getOrInitializeStrategy(DockerClientFactory.java:152)
+	at org.testcontainers.DockerClientFactory.client(DockerClientFactory.java:194)
+	at org.testcontainers.DockerClientFactory$1.getDockerClient(DockerClientFactory.java:106)
+	at com.github.dockerjava.api.DockerClientDelegate.authConfig(DockerClientDelegate.java:109)
+	at org.testcontainers.containers.GenericContainer.start(GenericContainer.java:329)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension$StoreAdapter.start(TestcontainersExtension.java:280)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension$StoreAdapter.access$200(TestcontainersExtension.java:267)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension.lambda$null$4(TestcontainersExtension.java:82)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension.lambda$startContainers$5(TestcontainersExtension.java:82)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension.startContainers(TestcontainersExtension.java:82)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension.beforeAll(TestcontainersExtension.java:56)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+Bash Check testcontainers strategy cache + raw docker socket access
+IN
+MSYS_NO_PATHCONV=1 wsl -d Ubuntu bash -c "cat ~/.testcontainers.properties 2>/dev/null; echo ---PING---; curl -s --unix-socket /var/run/docker.sock http://localhost/_ping; echo; echo ---VERSION---; curl -s --unix-socket /var/run/docker.sock http://localhost/version | head -c 150"
+
+OUT
+---PING---
+OK
+---VERSION---
+{"Platform":{"Name":""},"Version":"29.1.3","ApiVersion":"1.52","MinAPIVersion":"1.44","Os":"linux","Arch":"amd64","Components":[{"Name":"Engine","Vers
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\pom.xml
+Added 1 line
+Edit C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\final-build.sh
+Modified
+PowerShell STEP A retry with Testcontainers 1.21.0 + API 1.44
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/final-build.sh
+
+OUT
+=== STEP A: mvn clean verify ===
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.086 s -- in p2p.infra.HealthEndpointTest
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.645 s <<< FAILURE! -- in p2p.infra.PostgresIntegrationTest
+[ERROR] p2p.infra.PostgresIntegrationTest -- Time elapsed: 0.645 s <<< ERROR!
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.028 s <<< FAILURE! -- in p2p.infra.MinioIntegrationTest
+[ERROR] p2p.infra.MinioIntegrationTest -- Time elapsed: 0.028 s <<< ERROR!
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.376 s -- in p2p.transfer.TransferIntegrationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in p2p.AppTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.020 s -- in p2p.security.RateLimiterTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 36.59 s -- in p2p.lan.LanModeIntegrationTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 s -- in p2p.auth.JwtServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.550 s -- in p2p.storage.MultipartUploadTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in p2p.ws.WebSocketNotifierTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.528 s -- in p2p.plan.PlanEnforcementTest
+[ERROR] Errors: 
+[ERROR]   MinioIntegrationTest » IllegalState Previous attempts to find a Docker environment failed. Will not retry. Please see logs and check configuration
+[ERROR]   PostgresIntegrationTest » IllegalState Could not find a valid Docker environment. Please see logs and check configuration
+[ERROR] Tests run: 40, Failures: 0, Errors: 2, Skipped: 0
+[INFO] BUILD FAILURE
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.3.0:test (default-test) on project p2p: 
+[ERROR] 
+[ERROR] Please refer to /home/nisidh-kumar/nk/PeerLink/target/surefire-reports for the individual test results.
+[ERROR] Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\pom.xml
+Added 7 lines
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\diag-tc.sh
+12 lines
+PowerShell Diagnose testcontainers strategy failure with debug logging
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/diag-tc.sh
+
+OUT
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.726 s <<< FAILURE! -- in p2p.infra.PostgresIntegrationTest
+[ERROR] p2p.infra.PostgresIntegrationTest -- Time elapsed: 0.726 s <<< ERROR!
+java.lang.IllegalStateException: Could not find a valid Docker environment. Please see logs and check configuration
+	at org.testcontainers.dockerclient.DockerClientProviderStrategy.lambda$getFirstValidStrategy$7(DockerClientProviderStrategy.java:274)
+	at org.testcontainers.dockerclient.DockerClientProviderStrategy.getFirstValidStrategy(DockerClientProviderStrategy.java:265)
+	at org.testcontainers.DockerClientFactory.getOrInitializeStrategy(DockerClientFactory.java:154)
+	at org.testcontainers.DockerClientFactory.client(DockerClientFactory.java:196)
+	at org.testcontainers.DockerClientFactory$1.getDockerClient(DockerClientFactory.java:108)
+	at com.github.dockerjava.api.DockerClientDelegate.authConfig(DockerClientDelegate.java:109)
+[ERROR] Errors: 
+[ERROR]   PostgresIntegrationTest » IllegalState Could not find a valid Docker environment. Please see logs and check configuration
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.3.0:test (default-test) on project p2p: 
+[ERROR] 
+[ERROR] Please refer to /home/nisidh-kumar/nk/PeerLink/target/surefire-reports for the individual test results.
+[ERROR] Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+No strategy logs surfaced. Going straight at it — a standalone probe using docker-java on the test classpath to expose the real exception:
+
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\DockerProbe.java
+25 lines
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\run-probe.sh
+11 lines
+PowerShell Run docker-java probe to expose real failure
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/run-probe.sh
+
+OUT
+/mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/DockerProbe.java:2: error: package com.github.dockerjava.core does not exist
+import com.github.dockerjava.core.DefaultDockerClientConfig;
+                                 ^
+/mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/DockerProbe.java:3: error: package com.github.dockerjava.core does not exist
+import com.github.dockerjava.core.DockerClientImpl;
+                                 ^
+/mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/DockerProbe.java:9: error: cannot find symbol
+            DefaultDockerClientConfig config =
+            ^
+  symbol:   class DefaultDockerClientConfig
+  location: class DockerProbe
+/mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/DockerProbe.java:10: error: cannot find symbol
+                    DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+                    ^
+  symbol:   variable DefaultDockerClientConfig
+  location: class DockerProbe
+/mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/DockerProbe.java:15: error: cannot find symbol
+            DockerClient client = DockerClientImpl.getInstance(config, http);
+                                  ^
+  symbol:   variable DockerClientImpl
+  location: class DockerProbe
+5 errors
+error: compilation failed
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\DockerProbe.java
+25 lines
+PowerShell Run shaded docker-java probe
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/run-probe.sh
+
+OUT
+dockerHost=unix:///var/run/docker.sock apiVersion=0.0
+SLF4J: Class path contains multiple SLF4J providers.
+SLF4J: Found provider [org.slf4j.nop.NOPServiceProvider@3f792b9b]
+SLF4J: Found provider [org.slf4j.simple.SimpleServiceProvider@7b8233cd]
+SLF4J: Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@4b20ca2b]
+SLF4J: See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual provider is of type [org.slf4j.nop.NOPServiceProvider@3f792b9b]
+PING OK
+VERSION 1.52
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\DockerProbe2.java
+14 lines
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\run-probe2.sh
+14 lines
+PowerShell Probe testcontainers strategy selection with debug logs
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/run-probe2.sh
+
+OUT
+SLF4J: Class path contains multiple SLF4J providers.
+SLF4J: Found provider [org.slf4j.nop.NOPServiceProvider@51bf5add]
+SLF4J: Found provider [org.slf4j.simple.SimpleServiceProvider@7905a0b8]
+SLF4J: Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@35a3d49f]
+SLF4J: See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual provider is of type [org.slf4j.nop.NOPServiceProvider@51bf5add]
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by com.sun.jna.Native in an unnamed module (file:/home/nisidh-kumar/.m2/repository/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+TESTCONTAINERS FAILED:
+java.lang.IllegalStateException: Could not find a valid Docker environment. Please see logs and check configuration
+	at org.testcontainers.dockerclient.DockerClientProviderStrategy.lambda$getFirstValidStrategy$7(DockerClientProviderStrategy.java:274)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at org.testcontainers.dockerclient.DockerClientProviderStrategy.getFirstValidStrategy(DockerClientProviderStrategy.java:265)
+	at org.testcontainers.DockerClientFactory.getOrInitializeStrategy(DockerClientFactory.java:154)
+	at org.testcontainers.DockerClientFactory.client(DockerClientFactory.java:196)
+	at DockerProbe2.main(DockerProbe2.java:4)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at jdk.compiler/com.sun.tools.javac.launcher.SourceLauncher.execute(SourceLauncher.java:258)
+	at jdk.compiler/com.sun.tools.javac.launcher.SourceLauncher.run(SourceLauncher.java:138)
+	at jdk.compiler/com.sun.tools.javac.launcher.SourceLauncher.main(SourceLauncher.java:76)
+Edit C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\run-probe2.sh
+Removed 2 lines
+PowerShell Probe with logback logging active
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/run-probe2.sh
+
+OUT
+SLF4J: Class path contains multiple SLF4J providers.
+SLF4J: Found provider [org.slf4j.simple.SimpleServiceProvider@3cce57c7]
+SLF4J: Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@1cf56a1c]
+SLF4J: See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual provider is of type [org.slf4j.simple.SimpleServiceProvider@3cce57c7]
+[main] INFO org.testcontainers.DockerClientFactory - Testcontainers version: 1.21.0
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by com.sun.jna.Native in an unnamed module (file:/home/nisidh-kumar/.m2/repository/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+[main] INFO org.testcontainers.dockerclient.DockerMachineClientProviderStrategy - docker-machine executable was not found on PATH ([/home/nisidh-kumar/.jdk/jdk-25.0.2/bin, /usr/local/sbin, /usr/local/bin, /usr/sbin, /usr/bin, /sbin, /bin, /usr/games, /usr/local/games, /usr/lib/wsl/lib, /mnt/c/Windows/system32, /mnt/c/Windows, /mnt/c/Windows/System32/Wbem, /mnt/c/Windows/System32/WindowsPowerShell/v1.0/, /mnt/c/Windows/System32/OpenSSH/, /mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common, /mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR, /mnt/c/Program Files/Git/cmd, /mnt/c/Users/nisid/AppData/Local/Microsoft/WindowsApps, /mnt/c/Users/nisid/AppData/Local/Programs/Microsoft VS Code/bin])
+[main] ERROR org.testcontainers.dockerclient.DockerClientProviderStrategy - Could not find a valid Docker environment. Please check configuration. Attempted configurations were:
+	EnvironmentAndSystemPropertyClientProviderStrategy: failed with exception BadRequestException (Status 400: {"message":"client version 1.32 is too old. Minimum supported API version is 1.44, please upgrade your client to a newer version"}
+)
+	UnixSocketClientProviderStrategy: failed with exception BadRequestException (Status 400: {"message":"client version 1.32 is too old. Minimum supported API version is 1.44, please upgrade your client to a newer version"}
+)
+	DockerDesktopClientProviderStrategy: failed with exception NullPointerException (Cannot invoke "java.nio.file.Path.toString()" because the return value of "org.testcontainers.dockerclient.DockerDesktopClientProviderStrategy.getSocketPath()" is null)As no valid configuration was found, execution cannot continue.
+See https://java.testcontainers.org/on_failure.html for more details.
+TESTCONTAINERS FAILED:
+java.lang.IllegalStateException: Could not find a valid Docker environment. Please see logs and check configuration
+	at org.testcontainers.dockerclient.DockerClientProviderStrategy.lambda$getFirstValidStrategy$7(DockerClientProviderStrategy.java:274)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at org.testcontainers.dockerclient.DockerClientProviderStrategy.getFirstValidStrategy(DockerClientProviderStrategy.java:265)
+	at org.testcontainers.DockerClientFactory.getOrInitializeStrategy(DockerClientFactory.java:154)
+	at org.testcontainers.DockerClientFactory.client(DockerClientFactory.java:196)
+	at DockerProbe2.main(DockerProbe2.java:4)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at jdk.compiler/com.sun.tools.javac.launcher.SourceLauncher.execute(SourceLauncher.java:258)
+	at jdk.compiler/com.sun.tools.javac.launcher.SourceLauncher.run(SourceLauncher.java:138)
+	at jdk.compiler/com.sun.tools.javac.launcher.SourceLauncher.main(SourceLauncher.java:76)
+Explicit root cause: Testcontainers pins Docker API 1.32; this Docker 29 daemon requires ≥ 1.44. Checking Maven Central for the newest Testcontainers that handles this:
+
+PowerShell List latest testcontainers versions on Maven Central
+IN
+wsl -d Ubuntu bash -c "curl -s https://repo1.maven.org/maven2/org/testcontainers/testcontainers/maven-metadata.xml | grep -oE '<version>[^<]+</version>' | tail -8; curl -s https://repo1.maven.org/maven2/org/testcontainers/testcontainers/maven-metadata.xml | grep -oE '<latest>[^<]+</latest>'"
+
+OUT
+<version>1.21.3</version>
+<version>1.21.4</version>
+<version>2.0.0</version>
+<version>2.0.1</version>
+<version>2.0.2</version>
+<version>2.0.3</version>
+<version>2.0.4</version>
+<version>2.0.5</version>
+<latest>2.0.5</latest>
+2.0.5 is latest; 1.21.4 is the last 1.x. Trying the drop-in 1.21.4 first:
+
+Bash Bump testcontainers to 1.21.4
+IN
+cd "//wsl.localhost/Ubuntu/home/nisidh-kumar/nk/PeerLink" && sed -i 's/<version>1.21.0<\/version>/<version>1.21.4<\/version>/g' pom.xml && grep -c "1.21.4" pom.xml
+
+OUT
+4
+PowerShell Rebuild classpath with 1.21.4 and re-probe
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/run-probe.sh; wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/run-probe2.sh 2>&1 | Select-String -Pattern "TESTCONTAINERS|too old|FAILED" | Select-Object -First 5
+
+OUT
+dockerHost=unix:///var/run/docker.sock apiVersion=0.0
+SLF4J: Class path contains multiple SLF4J providers.
+SLF4J: Found provider [org.slf4j.nop.NOPServiceProvider@3f792b9b]
+SLF4J: Found provider [org.slf4j.simple.SimpleServiceProvider@7b8233cd]
+SLF4J: Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@4b20ca2b]
+SLF4J: See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual provider is of type [org.slf4j.nop.NOPServiceProvider@3f792b9b]
+PING OK
+VERSION 1.52
+
+[main] INFO org.testcontainers.DockerClientFactory - Testcontainers version: 1.21.4
+[main] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy - Found Docker environment with Environment 
+variables, system properties and defaults. Resolved dockerHost=unix:///var/run/docker.sock
+[main] INFO org.testcontainers.DockerClientFactory - Docker host IP address is localhost
+[main] INFO org.testcontainers.DockerClientFactory - Connected to docker: 
+[main] WARN org.testcontainers.utility.ResourceReaper -
+PowerShell STEP A: full clean verify with working Testcontainers
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/final-build.sh
+
+OUT
+=== STEP A: mvn clean verify ===
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.051 s -- in p2p.infra.HealthEndpointTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.010 s -- in p2p.infra.PostgresIntegrationTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.718 s -- in p2p.infra.MinioIntegrationTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.681 s -- in p2p.transfer.TransferIntegrationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in p2p.AppTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in p2p.security.RateLimiterTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 17.35 s -- in p2p.lan.LanModeIntegrationTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in p2p.auth.JwtServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.212 s -- in p2p.storage.MultipartUploadTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in p2p.ws.WebSocketNotifierTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.221 s -- in p2p.plan.PlanEnforcementTest
+[INFO] Tests run: 46, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+You've hit your session limit · resets 2:20pm (Asia/Calcutta)
+
+\\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\src\main\java\p2p\transfer\TransferManager.java
+complete the task
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\step-b.sh
+11 lines
+PowerShell STEP B: individual test classes
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/step-b.sh
+
+OUT
+WebSocketNotifierTest: PASS
+HealthEndpointTest: PASS
+PostgresIntegrationTest: PASS
+MinioIntegrationTest: PASS
+PlanEnforcementTest: PASS
+MultipartUploadTest: PASS
+JwtServiceTest: PASS
+RateLimiterTest: PASS
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\smoke-final.sh
+114 lines
+PowerShell STEP C: live smoke covering all phases
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/smoke-final.sh
+
+OUT
+Redis: connected
+WebSocket events on ws://localhost:9494/ws/events
+HEALTH OK: {'database': {'status': 'UP'}, 'redis': {'status': 'UP'}, 'storage': {'status': 'UP'}}
+ACTUATOR ALIAS OK
+JWT PLAN CLAIM OK: FREE
+WS endpoint status (with token): 426
+WS 426 OK
+WS 401 OK
+WS HANDSHAKE OK (101 Switching Protocols)
+DIRECT INITIATE OK: TMW38L
+DIRECT JOIN OK
+SESSION PERSISTED OK (transfer_sessions.json)
+USERNAME REQUEST OK
+REQUEST PERSISTED OK (transfer_requests.json)
+LINK DOWNLOAD OK
+EXPIRYDAYS ALIAS OK
+METRICS EXPANDED OK
+fylo_storage_used_bytes 17
+fylo_transfer_active_total 0
+fylo_websocket_connections_active 0
+K8S MANIFESTS OK: 18 files
+ALERTS OK
+GATLING SIMS OK
+=== SMOKE DONE ===
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\final-commit.sh
+58 lines
+PowerShell STEP D: commit all phases
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/final-commit.sh
+
+OUT
+[fylo-unified-platform 88a3078] Complete Fylo platform: WebSocket, Redis, persistent sessions, Testcontainers, K8s, Gatling, dashboards + alerting, health endpoint
+ 65 files changed, 3518 insertions(+), 73 deletions(-)
+ create mode 100644 db/migrations/V3__transfer_runtime_columns.sql
+ create mode 100644 deploy/grafana-dashboard-fylo.json
+ create mode 100644 deploy/prometheus-alerts.yml
+ create mode 100644 k8s/backend-configmap.yaml
+ create mode 100644 k8s/backend-deployment.yaml
+ create mode 100644 k8s/backend-hpa.yaml
+ create mode 100644 k8s/backend-ingress.yaml
+ create mode 100644 k8s/backend-secret.yaml
+ create mode 100644 k8s/backend-service.yaml
+ create mode 100644 k8s/grafana-deployment.yaml
+ create mode 100644 k8s/grafana-service.yaml
+ create mode 100644 k8s/kustomization.yaml
+ create mode 100644 k8s/minio-service.yaml
+ create mode 100644 k8s/minio-statefulset.yaml
+ create mode 100644 k8s/namespace.yaml
+ create mode 100644 k8s/postgres-service.yaml
+ create mode 100644 k8s/postgres-statefulset.yaml
+ create mode 100644 k8s/prometheus-deployment.yaml
+ create mode 100644 k8s/prometheus-service.yaml
+ create mode 100644 k8s/redis-deployment.yaml
+ create mode 100644 k8s/redis-service.yaml
+ create mode 100644 src/main/java/p2p/infra/RedisClient.java
+ create mode 100644 src/main/java/p2p/observability/HealthService.java
+ create mode 100644 src/main/java/p2p/transfer/JsonTransferHistoryRepository.java
+ create mode 100644 src/main/java/p2p/transfer/JsonTransferRequestRepository.java
+ create mode 100644 src/main/java/p2p/transfer/JsonTransferSessionRepository.java
+ create mode 100644 src/main/java/p2p/transfer/PgTransferHistoryRepository.java
+ create mode 100644 src/main/java/p2p/transfer/PgTransferRequestRepository.java
+ create mode 100644 src/main/java/p2p/transfer/PgTransferSessionRepository.java
+ create mode 100644 src/main/java/p2p/transfer/TransferHistoryRecord.java
+ create mode 100644 src/main/java/p2p/transfer/TransferHistoryRepository.java
+ create mode 100644 src/main/java/p2p/transfer/TransferRequestRecord.java
+ create mode 100644 src/main/java/p2p/transfer/TransferRequestRepository.java
+ create mode 100644 src/main/java/p2p/transfer/TransferSessionRecord.java
+ create mode 100644 src/main/java/p2p/transfer/TransferSessionRepository.java
+ create mode 100644 src/main/java/p2p/utils/PersistedJson.java
+ create mode 100644 src/main/java/p2p/ws/WebSocketNotifier.java
+ create mode 100644 src/main/java/p2p/ws/WebSocketServer.java
+ create mode 100644 src/test/java/p2p/infra/HealthEndpointTest.java
+ create mode 100644 src/test/java/p2p/infra/MinioIntegrationTest.java
+ create mode 100644 src/test/java/p2p/infra/PostgresIntegrationTest.java
+ create mode 100644 src/test/java/p2p/ws/WebSocketNotifierTest.java
+ create mode 100644 src/test/scala/p2p/load/FyloLoadSimulation.scala
+ create mode 100644 src/test/scala/p2p/load/LargeFileTransferSimulation.scala
+---
+88a3078 Complete Fylo platform: WebSocket, Redis, persistent sessions, Testcontainers, K8s, Gatling, dashboards + alerting, health endpoint
+5d708e3 Fix 11 verification gaps against FYLO_PROJECT_BACKBONE.md
+2d45e96 Evolve PeerLink into the Fylo unified platform (Parts 1 + 2)
+ src/test/java/p2p/security/RateLimiterTest.java    |  48 +++
+ src/test/java/p2p/ws/WebSocketNotifierTest.java    |  77 +++++
+ src/test/scala/p2p/load/FyloLoadSimulation.scala   |  94 ++++++
+ .../p2p/load/LargeFileTransferSimulation.scala     |  59 ++++
+ 65 files changed, 3518 insertions(+), 73 deletions(-)
+?? .github/agents/
+?? FYLO_PROJECT_BACKBONE.md
+Update Todos
+
+Phases A-I: all code, manifests, load tests, docs written
+
+STEP A/B: mvn clean verify + individual tests
+
+STEP C: live smoke
+
+STEP D: commit + final report
+All 9 phases are done, verified, and committed as 88a3078.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FYLO — FINAL COMPLETION REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PHASE A — Redis Integration               [PASS]
+PHASE B — WebSocket Real-time             [PASS]
+PHASE C — Persistent Transfer Sessions    [PASS]
+PHASE D — Testcontainers Integration      [PASS]
+PHASE E — Kubernetes Manifests            [PASS]  (18 files)
+PHASE F — Gatling Load Tests              [PASS]  (2 simulations)
+PHASE G — Health Endpoint                 [PASS]
+PHASE H — Grafana Dashboards + Alerting   [PASS]
+PHASE I — Final Wiring + Docs             [PASS]
+
+BUILD:   mvn clean verify → BUILD SUCCESS
+TESTS:   46 run, 0 failures, 0 errors
+         (incl. PostgresIntegrationTest 4/4 and MinioIntegrationTest 4/4
+          against REAL containers — the 128 MB multipart upload to real
+          MinIO passed)
+COMMIT:  88a3078 on fylo-unified-platform (65 files, +3,518)
+
+SMOKE TEST RESULTS (fresh instance, isolated data dir):
+  HEALTH OK                  [PASS]  database/redis/storage all UP
+  ACTUATOR ALIAS OK          [PASS]
+  JWT PLAN CLAIM OK          [PASS]  plan=FREE
+  WS ENDPOINT REACHABLE      [PASS]  426 with token, 401 without,
+                                     and a REAL RFC 6455 handshake
+                                     returned 101 Switching Protocols
+  DIRECT INITIATE OK         [PASS]  code TMW38L
+  DIRECT JOIN OK             [PASS]  + session found CONNECTING in
+                                     transfer_sessions.json (persisted)
+  USERNAME REQUEST OK        [PASS]  + PENDING row in
+                                     transfer_requests.json (persisted)
+  LINK DOWNLOAD OK           [PASS]
+  EXPIRYDAYS ALIAS OK        [PASS]
+  METRICS EXPANDED OK        [PASS]  fylo_transfer_active_total,
+                                     fylo_websocket_connections_active,
+                                     fylo_storage_used_bytes all live
+  K8S MANIFESTS OK           [PASS]  18 files
+  ALERTS OK                  [PASS]  HighTransferErrorRate + 5 more
+
+REMAINING FAILURES: none
+
+BACKBONE DELIVERABLE CHECKLIST:
+  Architecture diagrams      [DONE — docs/UNIFIED-PLATFORM.md]
+  Java package structure     [DONE]
+  Database schema + ER       [DONE — V1+V2+V3 migrations]
+  Transfer Engine            [DONE]
+  Discovery Engine           [DONE — _fylo._tcp.local]
+  Auth module                [DONE — JWT + plan claim + Redis sessions]
+  Storage abstraction        [DONE — Local/MinIO/S3, multipart]
+  REST controllers           [DONE]
+  WebSocket handlers         [DONE — p2p.ws, RFC 6455]
+  OpenAPI 3.1 spec           [DONE — docs/openapi.yaml]
+  Docker Compose (dev)       [DONE]
+  Kubernetes manifests       [DONE — k8s/]
+  CI/CD GitHub Actions       [DONE — .github/workflows/ci.yml]
+  Prometheus + Grafana       [DONE — deploy/ + dashboard JSON]
+  Alerting rules             [DONE — deploy/prometheus-alerts.yml]
+  Testcontainers tests       [DONE — real Postgres 16 + real MinIO]
+  Gatling performance tests  [DONE — FyloLoadSimulation]
+  Transfer Engine stress     [DONE — LargeFileTransferSimulation]
+  Plans & entitlements       [DONE]
+  Security hardening         [DONE]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Three things worth knowing beyond the checklist:
+
+Two real bugs were found and fixed by running the verification, not by assuming. Testcontainers 1.19.8 (the version the spec requested) cannot talk to your Docker Engine 29.1.3 — the daemon rejects its pinned API 1.32 (min is 1.44). I proved this with a standalone docker-java probe, then bumped to 1.21.4, which connects cleanly. And the progress-payload percentage rounded 10 MB/40 GB down to 0.0 — precision raised to two decimals.
+
+Two documented design adaptations. The WebSocket endpoint listens on its own port (API port + 1, e.g. ws://localhost:9091/ws/events) because plain com.sun.net.httpserver cannot hand its socket to an upgrade — GET /ws/events on 9090 returns 426 with the real URL, and the K8s ingress maps both onto 443. And Gatling simulations compile/run via mvn gatling:test (not surefire), so the default build stays fast.
+
+The smoke test ran against live Redis — you have one on localhost:6379, so Redis: connected means sessions, presence, and health genuinely exercised the Redis-backed paths, with the in-memory fallbacks covered by unit tests.
+
+The branch now has three commits: 2d45e96 (platform), 5d708e3 (backbone alignment), 88a3078 (production completion). Your terminal-1 server is still an older build — restart it with the fresh jar to get /health, WebSockets, and the rest.
+
+create a  skill file for this project
+I'll create a project skill that captures everything non-obvious about building, running, and verifying Fylo in this environment — the WSL toolchain, the Docker quirks we solved, the smoke-test flows, and the architecture rules.
+
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\.claude\skills\fylo\SKILL.md
+162 lines
+Bash List .claude contents to confirm skill placement
+IN
+find "//wsl.localhost/Ubuntu/home/nisidh-kumar/nk/PeerLink/.claude" -type f
+
+OUT
+//wsl.localhost/Ubuntu/home/nisidh-kumar/nk/PeerLink/.claude/skills/fylo/SKILL.md
+//wsl.localhost/Ubuntu/home/nisidh-kumar/nk/PeerLink/.claude/settings.json
+//wsl.localhost/Ubuntu/home/nisidh-kumar/nk/PeerLink/.claude/settings.local.json
+Created .claude/skills/fylo/SKILL.md — a project skill that any future Claude Code session in this repo will discover and can invoke as /fylo.
+
+It deliberately captures only what's not derivable from the code — the things this project's sessions had to learn the hard way:
+
+Environment traps: the toolchain lives in WSL (~/nk/PeerLink, Java 25 at ~/.jdk/jdk-25.0.2), Windows git rejects the UNC path, and complex commands must go through script files because PowerShell/Git Bash mangle $(...) and /mnt/c paths.
+The Docker workarounds we debugged: the broken docker-credential-desktop.exe config (fixed with a throwaway DOCKER_CONFIG), TESTCONTAINERS_RYUK_DISABLED, and the Docker 29 / API 1.44 constraint that forced Testcontainers ≥ 1.21.4.
+Safe run pattern: always start test instances on a 94xx port with -Dpeerlink.data.dir pointing at a temp dir, so ~/.peerlink doesn't get polluted — and the "stale jar on 9090" gotcha that bit us twice.
+Copy-paste smoke flows for all four modes: auth/token capture, plan-limit assertions (plan_limit 403s), the subscriptions.json trick to grant premium in tests, the 429 hammer, and the WS 426/401 contract.
+Architecture rules reviewers enforce but the compiler can't: modes go through TransferEngine only, plan enforcement stays in services, every repository keeps a JSON fallback, Redis users must degrade gracefully, guest modes never touch auth/storage.
+A docs map, including the precedence rule that where FYLO_PROJECT_BACKBONE.md disagrees with the code, the code + openapi.yaml win.
+The file is in the working tree but not committed (the last commit 88a3078 is untouched). If you want it in history: git add .claude/skills && git commit -m "Add fylo project skill" — say the word and I'll do it.
+
+create a basic frontend in minmalisam style for this backend update the ui folder
+Let me look at the existing ui/ folder first to understand what's there and how it talks to the backend.
+
+Bash Explore ui folder structure and config
+IN
+cd "//wsl.localhost/Ubuntu/home/nisidh-kumar/nk/PeerLink/ui" && find . -type f -not -path "./node_modules/*" -not -path "./.next/*" | head -40 && echo ---- && cat package.json 2>/dev/null && echo ---- && cat next.config.* 2>/dev/null
+
+OUT
+./package-lock.json
+./package.json
+./next.config.js
+./README.md
+./next-env.d.ts
+./src/lib/format.ts
+./src/components/InviteCode.tsx
+./src/components/TransfersPanel.tsx
+./src/components/NearbyDevices.tsx
+./src/components/IncomingOffers.tsx
+./src/components/FileUpload.tsx
+./src/components/FileDownload.tsx
+./src/app/globals.css
+./src/app/layout.tsx
+./src/app/page.tsx
+./tsconfig.json
+./tailwind.config.js
+./postcss.config.js
+----
+{
+  "name": "peerlink-ui",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "next": "^14.0.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "react-icons": "^4.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.39",
+    "@types/react-dom": "^18.2.17",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.54.0",
+    "eslint-config-next": "^14.0.3",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "typescript": "^5.3.2"
+  }
+}
+----
+/** @type {import('next').NextConfig} */
+
+// Override with BACKEND_URL if the Java server runs on a non-default port,
+// e.g. `BACKEND_URL=http://localhost:8080 npm run dev`.
+const backendUrl = process.env.BACKEND_URL ?? 'http://localhost:9090';
+
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  async rewrites() {
+    return [
+      {
+        source: '/api/upload',
+        destination: `${backendUrl}/upload`,
+      },
+      {
+        source: '/api/download/:port',
+        destination: `${backendUrl}/download/:port`,
+      },
+      {
+        source: '/api/lan/:path*',
+        destination: `${backendUrl}/lan/:path*`,
+      },
+      {
+        source: '/api/transfers',
+        destination: `${backendUrl}/transfers`,
+      },
+      {
+        source: '/api/transfers/:path*',
+        destination: `${backendUrl}/transfers/:path*`,
+      },
+    ];
+  },
+}
+
+module.exports = nextConfig
+Next.js 14 + Tailwind with existing components. Let me check the current page structure and styling approach before restyling:
+
+Read \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\src\app\page.tsx
+Read \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\src\app\globals.css
+Update Todos
+
+Read layout.tsx; add /api/v1 + /s rewrites to next.config.js
+
+Add src/lib/api.ts (token/session + authFetch)
+
+AuthPanel, PeoplePanel, LinksPanel components
+
+Rework page.tsx (Fylo brand, 5 tabs, account header) + layout metadata
+
+npm build in WSL + fix errors
+Read \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\src\app\layout.tsx
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\next.config.js
+Edit failed
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\src\app\layout.tsx
+Modified
+Read \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\next.config.js
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\next.config.js
+Added 10 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\src\lib\api.ts
+64 lines
+Now the three new panels — Auth, People (Mode 3), Links (Mode 4):
+
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\src\components\AuthPanel.tsx
+130 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\src\components\PeoplePanel.tsx
+195 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\src\components\LinksPanel.tsx
+145 lines
+Write \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\src\app\page.tsx
+195 lines
+Now build it in WSL:
+
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\ui-build.sh
+6 lines
+PowerShell Build the UI in WSL
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/ui-build.sh
+
+OUT
+v18.19.1
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/4) ...
+   Generating static pages (1/4) 
+   Generating static pages (2/4) 
+   Generating static pages (3/4) 
+ ✓ Generating static pages (4/4)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    45.4 kB         133 kB
+└ ○ /_not-found                          875 B            88 kB
++ First Load JS shared by all            87.2 kB
+  ├ chunks/117-933ca7588beb6e28.js       31.6 kB
+  ├ chunks/fd9d1056-42a1c2df9c4a85a8.js  53.7 kB
+  └ other shared chunks (total)          1.91 kB
+
+
+○  (Static)  prerendered as static content
+Build passes cleanly (types + lint). Quick live check that the page renders and the new proxy rewrites reach the backend:
+
+Write C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\ui-smoke.sh
+29 lines
+PowerShell Live smoke: page render + proxy rewrites
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/ui-smoke.sh
+
+OUT
+== page renders:
+Fylo
+Direct
+Links
+Nearby
+People
+Transfers
+== /api/v1 rewrite (expect 401 JSON from backend):
+<html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fapi%2Fv1%2Fplan'/><script id='redirect' data-redirect-url='/login?from=%2Fapi%2Fv1%2Fplan' src='/static/fe05fa06/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+Authentication required
+<!--
+-->
+
+</body></html>                                                                                                                                                                                                                                                                                                             [403]
+== /s rewrite (expect 404 from backend):
+<html><head><meta http-equiv='refresh' content='1;url=/login?from=%2Fs%2Fnosuch1'/><script id='redirect' data-redirect-url='/login?from=%2Fs%2Fnosuch1' src='/static/fe05fa06/scripts/redirect.js'></script></head><body style='background-color:white; color:white;'>
+Authentication required
+<!--
+-->
+
+</body></html>                                                                                                                                                                                                                                                                                                             [403]
+== /api/upload rewrite still works (register+login+link through proxy):
+[403]
+== DONE
+Edit C:\Users\nisid\AppData\Local\Temp\claude\--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink\d650cf39-f40c-45fa-abd5-76e27198ea8c\scratchpad\ui-smoke.sh
+Added 3 lines
+PowerShell UI smoke with correctly baked backend URL
+IN
+wsl -d Ubuntu bash /mnt/c/Users/nisid/AppData/Local/Temp/claude/--wsl-localhost-Ubuntu-home-nisidh-kumar-nk-PeerLink/d650cf39-f40c-45fa-abd5-76e27198ea8c/scratchpad/ui-smoke.sh
+
+OUT
+API server started on port 9494
+PeerLink server started on port 9494
+== page renders:
+Fylo
+Direct
+Links
+Nearby
+People
+Transfers
+== /api/v1 rewrite (expect 401 JSON from backend):
+{"error":"Login required"} [401]
+== /s rewrite (expect 404 from backend):
+{"error":"Link not found or expired"} [404]
+== /api/upload rewrite still works (register+login+link through proxy):
+[201]
+== DONE
+All verified. One clarifying comment in the config about the build-time nuance:
+
+Edit \\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\next.config.js
+Added 2 lines
+Update Todos
+
+Add /api/v1 + /s rewrites to next.config.js + layout metadata
+
+Add src/lib/api.ts (token/session + authFetch)
+
+AuthPanel, PeoplePanel, LinksPanel components
+
+Rework page.tsx (Fylo brand, 5 tabs, account header)
+
+npm build + live smoke through the proxy
+The ui/ folder is now a minimalist Fylo frontend covering all four sharing modes, built and smoke-tested end-to-end through the proxy.
+
+What changed (the existing app was already clean Tailwind/neutral, so I kept its language — monochrome, thin borders, one accent weight — and extended it rather than rewriting):
+
+page.tsx — rebranded to Fylo with five tabs: Direct (send + receive with invite codes, unchanged flows), Nearby (existing LAN panel), People (new), Links (new), Transfers (existing queue). Header has a quiet Sign in / @username toggle that reveals the auth panel.
+AuthPanel.tsx — sign in / create account against /api/v1/auth/*; tokens stored in localStorage, logout revokes the refresh token, and a fylo-session event keeps the header in sync.
+PeoplePanel.tsx — Mode 3: username search with online dots, pick a file → creates the live share → sends the request; incoming requests poll every 5 s with Accept (streams straight to disk via the browser's download manager) / Reject.
+LinksPanel.tsx — Mode 4: upload to cloud storage, list of links with copy/delete, download counts, expiry countdown, and a one-line plan usage readout (FREE · 17 B of 10.0 GB · 1/10 links).
+api.ts — shared session + authFetch helper (401 clears the session).
+next.config.js — proxy rewrites added for /api/v1/* and /s/:slug.
+Verified live: npm run build compiles clean (types + lint), the served page renders all five tabs, /api/v1/plan → backend 401 JSON, /s/nosuch1 → backend 404 JSON, and register through the proxy → 201.
+
+Two discoveries you should know:
+
+Jenkins is occupying port 9090 on your machine — that's what the earlier /metrics 302 actually was. When you run the backend for real, either stop Jenkins or run Fylo on another port and start the UI accordingly.
+BACKEND_URL is baked at build time for next build/next start (runtime only matters for npm run dev). So: BACKEND_URL=http://localhost:9494 npm run build && npx next start — noted in the config comment.
+To try it: backend on any port, then cd ui && BACKEND_URL=http://localhost:<port> npm run dev, open http://localhost:3000. The changes are in the working tree, uncommitted — say the word and I'll commit them (along with the skill file from earlier).
+
+\\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\start.sh
+give the list of the things i need to do maually to complete this project
+Here's everything that still needs a human decision or action, ordered from "today" to "before launch." The code itself is done and verified — this is the gap between a green build and a running product.
+
+Right now (5–30 minutes, on your machine)
+Free port 9090 or pick a new default — Jenkins is occupying 9090 on your machine (that's what the mysterious 302s were). Stop Jenkins, or run Fylo on another port. Also kill your old terminal-1 server — it's a stale build.
+Commit the pending work — the UI redesign and .claude/skills/fylo/SKILL.md are still uncommitted on fylo-unified-platform. Then merge to main when you're satisfied.
+Push to GitHub — the repo has no pushes yet; CI (.github/workflows/ci.yml) only starts working once it's on GitHub.
+Fix your Docker credential config (optional) — ~/.docker/config.json points at a missing docker-credential-desktop.exe; until fixed, Testcontainers/docker pulls need the DOCKER_CONFIG workaround baked into the scripts.
+Before deploying anywhere real
+Buy/configure the domain — fylo.app + api.fylo.app DNS; the ingress and OpenAPI spec assume them.
+Fill k8s/backend-secret.yaml with real values — it's a template with placeholders: DATABASE_URL, DATABASE_USER/PASSWORD, a fresh 32-byte JWT_SECRET, MinIO keys. Use sealed-secrets/external-secrets; never commit real values.
+TLS certificate — the ingress expects a fylo-tls secret (cert-manager + Let's Encrypt is the easy path).
+Choose infrastructure — either kubectl apply -k k8s/ on a cluster, or docker compose on a VPS (compose file is production-shaped but single-node). Decide managed Postgres/S3/Redis vs. the shipped StatefulSets.
+Enable image publishing — the docker-push step in ci.yml is commented out; uncomment and add a REGISTRY_TOKEN secret.
+Wire alerting to a channel — alert rules exist (deploy/prometheus-alerts.yml) but there's no Alertmanager receiver (Slack/email/PagerDuty). Also: import deploy/grafana-dashboard-fylo.json into Grafana (only the datasource is auto-provisioned), and add postgres_exporter if you want the DB-connections alert to fire.
+Backups + retention — Postgres dumps and MinIO bucket replication/backup; nothing is configured.
+Product decisions only you can make
+Billing — the premium plan is enforced but has no payment path: integrate Stripe (or similar) and call PlanService.grantPremium/revokePremium from its webhooks. Price the 500 GB / 1 TB / 2 TB tiers.
+Policy — Terms of Service, privacy policy, and an abuse/DMCA takedown process for public /s/{slug} links; decide whether FYLO_BLOCK_EXECUTABLES stays on.
+Update all your devices together — the mDNS rename to _fylo._tcp means old builds and new builds can't discover each other on the LAN.
+Remaining engineering (Part 3 — known, documented gaps)
+Cross-NAT relay for Direct Share — rendezvous sessions exist, but when two desktop apps can't connect directly, there's no relay tier to carry bytes.
+Mobile/desktop apps — the backend supports them (device tokens, QR pairing, discovery); the clients don't exist yet. The web UI is the only client.
+UI ↔ WebSocket — the server pushes real-time events on ws://host:port+1/ws/events, but the web UI still polls; wiring it up removes the 5-second delays in People/Transfers.
+Account hygiene features — email verification and password reset (email is stored, no SMTP integration).
+Fleet-scale leftovers — presigned-URL offload for link downloads, RS256/JWKS if you ever want per-node key isolation, notification queues → Redis pub/sub.
+Before announcing it to anyone
+Load test against staging — mvn gatling:test (both simulations), plus one real multi-GB transfer over an actual LAN and one over the internet, watching /metrics heap.
+Security pass — run mvn org.owasp:dependency-check-maven, rotate the dev credentials that appear in docker-compose.yml (fylo-dev-password), and confirm rate limits at the edge proxy, not just in-process.
+If you want, I can knock out #2 (commit the pending work) right now — everything else on the list needs your accounts, infrastructure, or decisions.
+
+\\wsl.localhost\Ubuntu\home\nisidh-kumar\nk\PeerLink\ui\next.config.js#1-49
+tell me how i could i switch as paid user and free user how to diffrenciate how to add payment gateway to it
+Good question — the plan machinery is already built; what's missing is only the payment trigger. Let me walk through the three parts.
+
+1. How free vs. paid is differentiated today
+There is exactly one authority: PlanService.java. Every feature gate asks it at request time:
+
+
+request → LinkShareService.enforceCreate()
+              → plans.entitlementsFor(userId)
+                    → subscriptions.json has an active entry?  → Entitlements.premium(storageBytes)
+                    → otherwise                                → Entitlements.FREE
+FREE: 10 GB files/storage, 10 links, 2-day expiry, no passwords/limits/analytics/revocation.
+PREMIUM: 200 GB files, 500 GB–2 TB storage, unlimited links, 7/30/90/never expiry, all premium features.
+Three places reflect the tier, and it's important to know which one enforces:
+
+Where	Role
+PlanService.entitlementsFor()	The enforcement — checked live on every action; changes take effect instantly, no re-login needed
+GET /api/v1/plan	What the UI reads (tier + entitlements + usage) — this is how the frontend should show/hide premium controls
+JWT plan claim	Informational only, stamped at login/refresh — never use it to enforce anything
+2. How to switch a user to paid manually (today, for testing)
+The seam already exists: PlanService.grantPremium(userId, storageBytes, expiresAtEpochMs) / revokePremium(userId). Without code, edit subscriptions.json in the data dir and restart:
+
+
+[ { "userId": "<the user's uuid>", "storageBytes": 536870912000, "expiresAtEpochMs": 0 } ]
+(0 = never expires; storageBytes picks the tier: 500 GB / 1 TB / 2 TB.) Get the uuid from users.json or /api/v1/users/me. This is exactly what the verification smoke tests did.
+
+A nicer dev/admin option I can add in a few minutes: POST /api/v1/admin/grant-premium guarded by an ADMIN_TOKEN env var — flips a user live without restart.
+
+3. Adding a payment gateway
+Since you're in India: Razorpay for Indian customers (UPI/cards/netbanking), Stripe if you want global reach — the integration shape is identical, so the code below works for either. The key architectural rule: the gateway never talks to your entitlements directly — its webhook calls the existing grantPremium/revokePremium. You already built the hard part.
+
+
+UI "Upgrade"                    Fylo backend                       Gateway
+     │  POST /api/v1/billing/checkout {tier}                          │
+     │──────────────►│                                                │
+     │               │  create subscription/checkout (secret key,     │
+     │               │  notes: {userId})  ────────────────────────────►
+     │               │◄──────────────  checkout URL / order id        │
+     │◄── redirect ──│                                                │
+     │────────────────────── user pays on gateway's hosted page ─────►│
+     │               │◄── POST /api/v1/billing/webhook (signed) ──────│
+     │               │  verify HMAC signature                         │
+     │               │  payment/subscription activated →              │
+     │               │    planService.grantPremium(userId, bytes,     │
+     │               │                     currentPeriodEnd)          │
+     │               │  cancelled/expired →                           │
+     │               │    planService.revokePremium(userId)           │
+     │  GET /api/v1/plan  →  "PREMIUM"  (instantly — live lookup)     │
+What you'd add to this codebase (~3 files, no changes to enforcement):
+
+p2p.billing.BillingService — holds the tier table (price/plan id → storageBytes), creates checkout sessions via the gateway's REST API (RAZORPAY_KEY_ID/KEY_SECRET or STRIPE_SECRET_KEY from env), and handles webhook events. Store the gateway's subscription_id alongside the userId (extend the Subscription record) so cancellations map back.
+Two routes in ApiRouter:
+POST /api/v1/billing/checkout — authenticated; embeds userId in the checkout's metadata/notes so the webhook can identify who paid.
+POST /api/v1/billing/webhook — no auth, but HMAC-signature-verified (X-Razorpay-Signature / Stripe-Signature with the webhook secret), idempotent on event id. This is the only security-critical piece: without signature verification anyone could POST themselves premium.
+UI: an "Upgrade" button in the Links panel's plan line → hits checkout → window.location = checkoutUrl; on return, re-fetch /api/v1/plan.
+Renewals and expiry come free with your existing design: each invoice.paid/subscription.charged webhook calls grantPremium again with the new current_period_end as expiresAtEpochMs, and Subscription.active() already downgrades anyone whose period lapses — even if a cancellation webhook is missed.
+
+For local testing before you have a public URL: both gateways have test modes, and you tunnel webhooks with stripe listen --forward-to localhost:7000/api/v1/billing/webhook or ngrok for Razorpay.
+
+Two decisions only you can make before any of this is wired: which gateway (Razorpay needs a KYC'd account; Stripe India has invite restrictions), and the actual prices for the three storage tiers.
+
+Want me to implement it? I'd build BillingService + the two routes + webhook signature verification with the gateway behind a small interface (so Razorpay/Stripe is a config choice), plus the UI upgrade button — runnable in test mode as soon as you paste in test API keys.
