@@ -35,6 +35,7 @@ public final class DevicePresenceManager implements Closeable {
     }
 
     public void start() {
+        System.out.println("event=device.presence.start intervalSeconds=" + intervalSeconds);
         scheduler.scheduleAtFixedRate(this::sweep, intervalSeconds, intervalSeconds, TimeUnit.SECONDS);
     }
 
@@ -57,7 +58,11 @@ public final class DevicePresenceManager implements Closeable {
         }
         int misses = missCounts.computeIfAbsent(device.deviceId(), k -> new AtomicInteger())
                 .incrementAndGet();
+        System.err.println("event=device.heartbeat.failed peerDeviceId=" + device.deviceId()
+                + " missCount=" + misses);
         if (misses >= MISSES_BEFORE_OFFLINE) {
+            System.err.println("event=device.timeout peerDeviceId=" + device.deviceId()
+                    + " misses=" + misses);
             registry.markOffline(device.deviceId());
             missCounts.remove(device.deviceId());
         }
@@ -65,6 +70,7 @@ public final class DevicePresenceManager implements Closeable {
 
     @Override
     public void close() {
+        System.out.println("event=device.presence.stop");
         scheduler.shutdownNow();
     }
 }

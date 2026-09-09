@@ -98,15 +98,15 @@ java -jar target/p2p-1.0-SNAPSHOT.jar
 > Without `JAVA_HOME` set, Maven uses the system Java 21 and fails with
 > `release version 25 not supported`.
 
-The API server listens on port **9090** by default (8080 is commonly taken by
-Jenkins). To use a different port, set it on both halves:
+The desktop Fylo Local Agent listens on `127.0.0.1:7000` by default. It owns
+LAN discovery, pairing, direct PeerLink transfers, and the browser-facing
+`/agent/*` API. The Docker deployment runs the unified backend explicitly on
+port `9090`.
 
 ```bash
-PORT=8081 java -jar target/p2p-1.0-SNAPSHOT.jar          # backend
-BACKEND_URL=http://localhost:8081 npm run dev             # frontend (from ui/)
+FYLO_AGENT_PORT=7001 java -jar target/p2p-1.0-SNAPSHOT.jar
+FYLO_AGENT_URL=http://127.0.0.1:7001 npm run dev         # from ui/
 ```
-
-The API server starts on port 9090.
 
 Frontend — terminal 2:
 
@@ -156,7 +156,7 @@ the server, and launch the frontend dev server.
 
 ## Troubleshooting LAN mode
 
-- **`ECONNREFUSED 127.0.0.1:9090` in the frontend log** — the Java backend
+- **`ECONNREFUSED 127.0.0.1:7000` in the frontend log** — the local agent
   isn't running. Start it first (`java -jar target/p2p-1.0-SNAPSHOT.jar`),
   then the UI; the dev proxy just forwards `/api/*` to it.
 - **Setup for two laptops** — run the *backend* on both (each backend is the
@@ -168,7 +168,7 @@ the server, and launch the frontend dev server.
   Fix one of these ways:
   1. Enable **mirrored networking** (Windows 11 22H2+): put
      `[wsl2]` / `networkingMode=mirrored` in `C:\Users\<you>\.wslconfig`, run
-     `wsl --shutdown`, restart, and allow Java/port 9090 through Windows
+    `wsl --shutdown`, restart, and allow Java/port 7000 through Windows
      Firewall. WSL then shares the laptop's real LAN address.
   2. Or run the backend **on Windows directly** (the jar is portable; install
      a Windows JDK 21+).
@@ -210,7 +210,8 @@ One backend process serves everything:
 
 | Surface | Where |
 |---|---|
-| REST API (all four modes) | `http://localhost:9090` — `/api/v1/**` per [docs/openapi.yaml](docs/openapi.yaml) |
+| Local Agent API | `http://127.0.0.1:7000` — `/agent/**` and local transfer routes |
+| Unified backend API | `http://localhost:9090` in Docker — `/api/v1/**` per [docs/openapi.yaml](docs/openapi.yaml) |
 | Gateway (legacy UI routes) | `/upload`, `/download/{port}`, `/lan/*`, `/transfers` |
 | Public link downloads | `GET /s/{slug}` (Range supported) |
 | WebSocket events | `ws://localhost:9091/ws/events?token=<accessToken>` (RFC 6455; `GET /ws/events` on 9090 answers 426 with this URL) |
@@ -227,7 +228,8 @@ Environment variables (all optional — defaults give a zero-infra single node):
 | `REDIS_URL` | `redis://…` | none → in-memory |
 | `S3_ENDPOINT` / `S3_REGION` / `S3_BUCKET` | url / region / name | none |
 | `S3_ACCESS_KEY` / `S3_SECRET_KEY` | string | none |
-| `PORT` | number | `9090` (WebSocket = PORT+1) |
+| `FYLO_AGENT_PORT` | number | `7000` (WebSocket = port+1) |
+| `PORT` | number | backend deployment override; Docker uses `9090` |
 | `FYLO_BLOCK_EXECUTABLES` | `true` \| `false` | `true` |
 
 Quick start (plain Java, no Docker):

@@ -4,7 +4,8 @@
 // e.g. `BACKEND_URL=http://localhost:8080 npm run dev`.
 // NOTE: for production (`next build` + `next start`) the rewrite targets are
 // baked at BUILD time — set BACKEND_URL when running `npm run build`.
-const backendUrl = process.env.BACKEND_URL ?? 'http://localhost:7000';
+const agentUrl = process.env.FYLO_AGENT_URL ?? 'http://127.0.0.1:7000';
+const backendUrl = process.env.BACKEND_URL ?? agentUrl;
 
 const nextConfig = {
   reactStrictMode: true,
@@ -13,23 +14,23 @@ const nextConfig = {
     return [
       {
         source: '/api/upload',
-        destination: `${backendUrl}/upload`,
+        destination: `${agentUrl}/upload`,
       },
       {
         source: '/api/download/:port',
-        destination: `${backendUrl}/download/:port`,
+        destination: `${agentUrl}/download/:port`,
       },
       {
-        source: '/api/lan/:path*',
-        destination: `${backendUrl}/lan/:path*`,
+        source: '/api/agent/:path*',
+        destination: `${agentUrl}/agent/:path*`,
       },
       {
         source: '/api/transfers',
-        destination: `${backendUrl}/transfers`,
+        destination: `${agentUrl}/agent/transfers`,
       },
       {
         source: '/api/transfers/:path*',
-        destination: `${backendUrl}/transfers/:path*`,
+        destination: `${agentUrl}/agent/transfers/:path*`,
       },
       // Unified platform API (auth, users, requests, links, plan)
       {

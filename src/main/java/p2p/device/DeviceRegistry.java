@@ -52,6 +52,7 @@ public final class DeviceRegistry {
     public void upsertOnline(String deviceId, String name, String os, String deviceType,
                              String host, int apiPort) {
         Entry entry = devices.computeIfAbsent(deviceId, Entry::new);
+        boolean wasOnline = entry.online;
         entry.name = name;
         entry.os = os;
         entry.deviceType = deviceType;
@@ -59,6 +60,10 @@ public final class DeviceRegistry {
         entry.apiPort = apiPort;
         entry.lastSeenEpochMs = System.currentTimeMillis();
         entry.online = true;
+        if (!wasOnline) {
+            System.out.println("event=device.online peerDeviceId=" + deviceId
+                    + " host=" + host + " apiPort=" + apiPort);
+        }
         persist();
     }
 
@@ -73,7 +78,11 @@ public final class DeviceRegistry {
     public void markOffline(String deviceId) {
         Entry entry = devices.get(deviceId);
         if (entry != null) {
+            boolean wasOnline = entry.online;
             entry.online = false;
+            if (wasOnline) {
+                System.out.println("event=device.offline peerDeviceId=" + deviceId);
+            }
         }
     }
 
@@ -81,6 +90,8 @@ public final class DeviceRegistry {
         Entry entry = devices.get(deviceId);
         if (entry != null) {
             entry.trusted = trusted;
+            System.out.println("event=device.trust.updated peerDeviceId=" + deviceId
+                    + " trusted=" + trusted);
             persist();
         }
     }

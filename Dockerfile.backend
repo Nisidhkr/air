@@ -9,4 +9,4 @@ WORKDIR /app
 COPY --from=build /build/target/p2p-1.0-SNAPSHOT.jar app.jar
 COPY --from=build /build/target/dependency/*.jar ./lib/
 EXPOSE 9090
-CMD ["java", "-cp", "app.jar:lib/*", "p2p.App"]
+CMD ["java", "-cp", "app.jar:lib/*", "p2p.App", "9090"]

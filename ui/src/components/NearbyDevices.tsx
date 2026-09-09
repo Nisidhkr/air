@@ -29,7 +29,7 @@ export default function NearbyDevices() {
     let cancelled = false;
     const poll = async () => {
       try {
-        const response = await axios.get('/api/lan/devices');
+        const response = await axios.get('/api/agent/devices');
         if (!cancelled) setDevices(response.data.devices ?? []);
       } catch {
         /* backend not up yet; keep polling */
@@ -51,9 +51,9 @@ export default function NearbyDevices() {
     setConnecting(true);
     setError('');
     try {
-      const response = await axios.post('/api/lan/connect', {
+      const response = await axios.post('/api/agent/connect', {
         host,
-        port: portStr ? parseInt(portStr, 10) : 9090,
+        port: portStr ? parseInt(portStr, 10) : 7000,
       });
       setStatusMsg(`Connected to ${response.data.name}.`);
       setManualAddress('');
@@ -92,7 +92,7 @@ export default function NearbyDevices() {
         ports.push(response.data.port);
       }
       setStatusMsg('Offering files…');
-      await axios.post('/api/lan/send', { deviceId: device.deviceId, ports });
+      await axios.post('/api/agent/send', { deviceId: device.deviceId, ports });
       const total = files.reduce((sum, f) => sum + f.size, 0);
       setStatusMsg(
         `Offered ${files.length} file${files.length > 1 ? 's' : ''} (${formatSize(total)}) to ${device.name} — waiting for them to accept.`
@@ -183,7 +183,7 @@ export default function NearbyDevices() {
             type="text"
             value={manualAddress}
             onChange={(e) => setManualAddress(e.target.value)}
-            placeholder="192.168.1.42 or 192.168.1.42:9090"
+            placeholder="192.168.1.42 or 192.168.1.42:7000"
             className="input-field flex-1 font-mono text-xs"
             disabled={connecting}
           />

@@ -69,6 +69,11 @@ public final class LanShareService {
                     .trackOutgoingSend(file.name(), file.size(), device.name()).id());
         }
         outgoingOffers.put(offerId, transferIds);
+        System.out.println("event=lan.offer.created offerId=" + offerId
+                + " peerDeviceId=" + deviceId
+                + " host=" + device.host()
+                + " apiPort=" + device.apiPort()
+                + " fileCount=" + files.size());
 
         try {
             controlPlane.postOffer(device.host(), device.apiPort(),
@@ -77,6 +82,9 @@ public final class LanShareService {
         } catch (IOException e) {
             transferIds.forEach(id -> transferManager.updateStatus(id, TransferManager.Status.FAILED));
             outgoingOffers.remove(offerId);
+            System.err.println("event=lan.offer.failed offerId=" + offerId
+                    + " peerDeviceId=" + deviceId
+                    + " error=" + e.getMessage());
             throw new IOException("Could not reach " + device.name() + ": " + e.getMessage(), e);
         }
         return offerId;
@@ -97,6 +105,8 @@ public final class LanShareService {
         };
         if (status != null) {
             transferIds.forEach(id -> transferManager.updateStatus(id, status));
+            System.out.println("event=lan.offer.result.received offerId=" + result.offerId()
+                    + " status=" + result.status());
         }
         if (status == TransferManager.Status.COMPLETED || status == TransferManager.Status.REJECTED
                 || status == TransferManager.Status.FAILED) {

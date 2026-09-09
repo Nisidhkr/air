@@ -9,6 +9,7 @@ services:
     ports:
       - "9090:9090"
     environment:
+      PORT: 9090
       # ── ONE database ──
       DATABASE_URL: jdbc:postgresql://postgres:5432/air
       DATABASE_USER: air
@@ -37,7 +38,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:9090
+      - BACKEND_URL=http://backend:9090
     depends_on:
       - backend
 

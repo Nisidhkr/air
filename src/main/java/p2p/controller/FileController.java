@@ -6,6 +6,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 // (multipart streaming now lives in p2p.utils.MultipartUploads)
+import p2p.agent.AgentConfig;
+import p2p.agent.AgentServer;
 import p2p.api.ApiRouter;
 import p2p.auth.AuthService;
 import p2p.auth.JwtService;
@@ -121,6 +123,7 @@ public class FileController {
     private final HttpServer server;
     private final Path uploadDir;
     private final ExecutorService executor;
+    private final AgentConfig agentConfig;
 
     private final DeviceIdentity identity;
     private final DeviceRegistry deviceRegistry;
@@ -141,26 +144,29 @@ public class FileController {
     private final p2p.ws.WebSocketServer wsServer;
 
     public FileController(int port) throws IOException {
-        this(port,
-                Path.of(System.getProperty("peerlink.data.dir",
-                        System.getProperty("user.home") + "/.peerlink")),
-                Path.of(System.getProperty("peerlink.downloads.dir",
-                        System.getProperty("user.home") + "/Downloads/PeerLink")));
+        this(AgentConfig.forPort(port));
     }
 
     public FileController(int port, Path dataDir, Path downloadsDir) throws IOException {
+        this(AgentConfig.forTest(port, dataDir, downloadsDir));
+    }
+
+    public FileController(AgentConfig config) throws IOException {
         this.fileSharer = new FileSharer();
-        this.server = HttpServer.create(new InetSocketAddress(port), 0);
+        this.server = HttpServer.create(new InetSocketAddress(config.agentPort()), 0);
         this.uploadDir = Path.of(System.getProperty("java.io.tmpdir"), "peerlink-uploads");
         Files.createDirectories(uploadDir);
-        Files.createDirectories(downloadsDir);
+        Files.createDirectories(config.downloadsDir());
 
         int boundPort = server.getAddress().getPort();
-        this.identity = DeviceIdentity.loadOrCreate(dataDir);
-        this.deviceRegistry = new DeviceRegistry(dataDir);
+        int wsPort = config.webSocketPort() > 0 ? config.webSocketPort() : 0;
+        this.agentConfig = config.withBoundPorts(boundPort, wsPort);
+        this.identity = DeviceIdentity.loadOrCreate(config.dataDir());
+        this.deviceRegistry = new DeviceRegistry(config.dataDir());
         this.transferManager = new TransferManager(3);
         this.controlPlane = new ControlPlaneClient();
-        this.offerManager = new OfferManager(deviceRegistry, transferManager, controlPlane, downloadsDir);
+        this.offerManager = new OfferManager(deviceRegistry, transferManager, controlPlane,
+                config.downloadsDir());
         this.lanShareService = new LanShareService(identity, deviceRegistry, fileSharer,
                 transferManager, controlPlane, boundPort);
         this.discoveryService = new DeviceDiscoveryService(identity, deviceRegistry, boundPort);
@@ -178,32 +184,32 @@ public class FileController {
                                         : "not configured — in-memory mode")));
 
         // 2. Storage backend chosen by FYLO_STORAGE (local | minio | s3).
-        StorageProvider storage = StorageProviders.fromEnv(dataDir);
+        StorageProvider storage = StorageProviders.fromEnv(config.dataDir());
         this.engine = new TransferEngine(fileSharer, transferManager, storage);
 
         // 3-6. The ONE database seam: PostgreSQL repositories when
         // DATABASE_URL is set, JSON files otherwise. Same interfaces.
         UserRepository userRepository = PgUserRepository.fromEnv()
                 .<UserRepository>map(pg -> pg)
-                .orElseGet(() -> new JsonUserRepository(dataDir));
+                .orElseGet(() -> new JsonUserRepository(config.dataDir()));
         p2p.transfer.TransferSessionRepository sessionRepo =
                 p2p.transfer.PgTransferSessionRepository.fromEnv()
                         .<p2p.transfer.TransferSessionRepository>map(pg -> pg)
-                        .orElseGet(() -> new p2p.transfer.JsonTransferSessionRepository(dataDir));
+                        .orElseGet(() -> new p2p.transfer.JsonTransferSessionRepository(config.dataDir()));
         p2p.transfer.TransferRequestRepository requestRepo =
                 p2p.transfer.PgTransferRequestRepository.fromEnv()
                         .<p2p.transfer.TransferRequestRepository>map(pg -> pg)
-                        .orElseGet(() -> new p2p.transfer.JsonTransferRequestRepository(dataDir));
+                        .orElseGet(() -> new p2p.transfer.JsonTransferRequestRepository(config.dataDir()));
         p2p.transfer.TransferHistoryRepository historyRepo =
                 p2p.transfer.PgTransferHistoryRepository.fromEnv()
                         .<p2p.transfer.TransferHistoryRepository>map(pg -> pg)
-                        .orElseGet(() -> new p2p.transfer.JsonTransferHistoryRepository(dataDir));
+                        .orElseGet(() -> new p2p.transfer.JsonTransferHistoryRepository(config.dataDir()));
 
         this.directShare = new DirectShareService(engine, sessionRepo);
 
-        JwtService jwtService = new JwtService(dataDir);
+        JwtService jwtService = new JwtService(config.dataDir());
         SessionService sessionService = new SessionService(redis);
-        PlanService planService = new PlanService(dataDir);
+        PlanService planService = new PlanService(config.dataDir());
         AuthService authService = new AuthService(userRepository, jwtService, sessionService,
                 planService);
         PresenceService userPresence = new PresenceService(redis);
@@ -214,12 +220,12 @@ public class FileController {
                 engine, userRepository, userPresence, notifications, history);
         usernameShare.setPersistence(sessionRepo, requestRepo);
         this.linkShare = new LinkShareService(engine, history, planService,
-                new FileSafetyService(), userRepository, dataDir);
+                new FileSafetyService(), userRepository, config.dataDir());
         TrustedDeviceService trustedDevices = new TrustedDeviceService(deviceRegistry);
         QrPairingService pairingService = new QrPairingService(identity, deviceRegistry, boundPort);
 
         // 7-8. WebSocket server (own listener: API port + 1) + notifier.
-        this.wsServer = new p2p.ws.WebSocketServer(boundPort + 1, authService, redis);
+        this.wsServer = new p2p.ws.WebSocketServer(wsPort, authService, redis);
         p2p.ws.WebSocketNotifier notifier = p2p.ws.WebSocketNotifier.over(wsServer);
         usernameShare.setNotifier(notifier);
         notifications.setNotifier(notifier);
@@ -269,19 +275,23 @@ public class FileController {
         server.createContext("/transfers", new TransfersHandler());
         server.createContext("/metrics", metrics.handler());
         server.createContext("/", new CORSHandler());
+        new AgentServer(agentConfig, identity, deviceRegistry, transferManager,
+                lanShareService, offerManager, controlPlane, pairingService).mount(server);
         apiRouter.mount(server);
         server.setExecutor(executor);
     }
 
     public void start() {
         server.start();
-        System.out.println("API server started on port " + server.getAddress().getPort());
+        System.out.println("event=agent.http.start port=" + server.getAddress().getPort());
         try {
             wsServer.start();
-            System.out.println("WebSocket events on ws://localhost:" + wsServer.port()
+            System.out.println("event=agent.websocket.start port=" + wsServer.port()
+                    + " url=ws://localhost:" + wsServer.port()
                     + "/ws/events");
         } catch (IOException e) {
-            System.err.println("WebSocket server unavailable: " + e.getMessage());
+            System.err.println("event=agent.websocket.unavailable port=" + wsServer.port()
+                    + " error=" + e.getMessage());
         }
         presenceManager.start();
         // mDNS startup can take a few seconds and may fail on networks without
@@ -289,10 +299,10 @@ public class FileController {
         Thread.ofVirtual().name("mdns-startup").start(() -> {
             try {
                 discoveryService.start();
-                System.out.println("LAN discovery active as '" + identity.name() + "'");
+                System.out.println("event=mdns.ready deviceId=" + identity.deviceId()
+                        + " serviceType=" + DeviceDiscoveryService.MDNS_SERVICE_TYPE);
             } catch (Exception e) {
-                System.err.println("LAN discovery unavailable (" + e.getMessage()
-                        + "); internet sharing unaffected");
+                System.err.println("event=mdns.unavailable error=" + e.getMessage());
             }
         });
     }
@@ -310,7 +320,7 @@ public class FileController {
         linkShare.close();
         engine.close(); // closes the transfer manager and all active shares
         executor.shutdown();
-        System.out.println("API server stopped");
+        System.out.println("event=agent.http.stopped port=" + server.getAddress().getPort());
     }
 
     /** Exposed for integration tests and future UI needs. */
@@ -324,6 +334,10 @@ public class FileController {
 
     public int port() {
         return server.getAddress().getPort();
+    }
+
+    public int webSocketPort() {
+        return wsServer.port();
     }
 
     /** Shared token-bucket check for the gateway endpoints; 429 on reject. */
@@ -667,7 +681,8 @@ public class FileController {
                 sendText(exchange, 400, "host is required");
                 return;
             }
-            int peerPort = request.port() == null || request.port() <= 0 ? 9090 : request.port();
+            int peerPort = request.port() == null || request.port() <= 0
+                    ? AgentConfig.DEFAULT_AGENT_PORT : request.port();
             try {
                 LanMessages.Hello peer = controlPlane.exchangeHello(request.host(), peerPort,
                         new LanMessages.Hello(identity.deviceId(), identity.name(),

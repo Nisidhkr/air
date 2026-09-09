@@ -59,14 +59,15 @@ npm start
 
 ## Backend Integration
 
-The UI communicates with the Java backend running on port 9090. Make sure the backend server is running before using the UI.
+The UI communicates with the Fylo Local Agent at `127.0.0.1:7000` by default.
+Make sure the agent is running before using Nearby transfers.
 
 To start the backend server:
 
 ```bash
 cd ..  # Go back to the project root
 mvn clean package
-java -jar target/p2p-1.0-SNAPSHOT.jar
+java -jar target/p2p-1.0-SNAPSHOT.jar 7000
 ```
 
 ## Project Structure

@@ -26,7 +26,7 @@ export default function IncomingOffers() {
     let cancelled = false;
     const poll = async () => {
       try {
-        const response = await axios.get('/api/lan/offers');
+        const response = await axios.get('/api/agent/offers');
         if (!cancelled) setOffers(response.data ?? []);
       } catch {
         /* backend not reachable; keep polling */
@@ -43,7 +43,7 @@ export default function IncomingOffers() {
   const respond = async (offerId: string, action: 'accept' | 'reject') => {
     setBusy(true);
     try {
-      await axios.post(`/api/lan/offers/${offerId}`, { action, trust: action === 'accept' && trust });
+      await axios.post(`/api/agent/offers/${offerId}`, { action, trust: action === 'accept' && trust });
       setOffers((prev) => prev.filter((o) => o.offerId !== offerId));
       setTrust(false);
     } finally {

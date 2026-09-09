@@ -39,7 +39,7 @@ construction* — there is exactly one implementation of each.
 |---|---|---|
 | `p2p.device` | `DeviceIdentity` | persistent device ID + name + OS (survives restarts) |
 | | `DeviceRegistry` | known devices, online state, last-seen, trusted flags; persisted |
-| | `DeviceDiscoveryService` | mDNS/DNS-SD registration + browsing (`_peerlink._tcp.local.`) |
+| | `DeviceDiscoveryService` | mDNS/DNS-SD registration + browsing (`_fylo._tcp.local.`) |
 | | `HeartbeatService` | end-to-end liveness probe (`GET /lan/ping`) |
 | | `DevicePresenceManager` | online/offline policy (2 missed heartbeats → offline) |
 | `p2p.lan` | `LanMessages` | control-plane JSON records (offer, result) |
@@ -61,15 +61,15 @@ Avahi on Linux. "mDNS", "Bonjour", "Zeroconf", and "DNS-SD" are the same
 protocol family — choosing it covers all of them. The JVM side uses JmDNS
 (pure Java, no native deps, works on Windows/Linux/macOS).
 
-Each node advertises `_peerlink._tcp.local.` with its HTTP API port and TXT
-records (`id`, `name`, `os`, `type`, `v`). Peers appear automatically — no
+Each node advertises `_fylo._tcp.local.` with its HTTP API port and TXT
+records (`id`, `name`, `os`, `type`, `version`, `capabilities`). Peers appear automatically — no
 IPs, no ports, no configuration. Discovery is best-effort: where multicast is
 blocked (guest Wi-Fi, some VPNs, WSL2 NAT in some setups), devices simply
 don't auto-appear and the invite-code flow still works; an incoming offer also
 registers the sender (the registry learns from real traffic, not only mDNS).
 
 **Cross-platform strategy for mobile:** Android/iOS apps implement the same
-two things desktop nodes do — (1) advertise/browse `_peerlink._tcp` with
+ two things desktop nodes do — (1) advertise/browse `_fylo._tcp` with
 NSD/`NWBrowser`, (2) speak the control plane (3 small JSON endpoints) and the
 binary protocol (framed messages + raw ranges; see PROTOCOL.md). No part of
 the protocol depends on the JVM.

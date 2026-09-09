@@ -21,6 +21,10 @@ public final class ControlPlaneClient {
             .build();
 
     public void postOffer(String host, int apiPort, LanMessages.OfferRequest offer) throws IOException {
+        System.out.println("event=lan.offer.outgoing offerId=" + offer.offerId()
+                + " senderDeviceId=" + offer.deviceId()
+                + " host=" + host + " apiPort=" + apiPort
+                + " fileCount=" + offer.files().size());
         post("http://" + host + ":" + apiPort + "/lan/offer", offer);
     }
 
@@ -28,6 +32,7 @@ public final class ControlPlaneClient {
     public LanMessages.Hello exchangeHello(String host, int apiPort, LanMessages.Hello self)
             throws IOException {
         try {
+            System.out.println("event=lan.hello.start host=" + host + " apiPort=" + apiPort);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("http://" + host + ":" + apiPort + "/lan/hello"))
                     .timeout(Duration.ofSeconds(10))
@@ -39,7 +44,10 @@ public final class ControlPlaneClient {
             if (response.statusCode() / 100 != 2) {
                 throw new IOException("Peer responded HTTP " + response.statusCode());
             }
-            return mapper.readValue(response.body(), LanMessages.Hello.class);
+            LanMessages.Hello peer = mapper.readValue(response.body(), LanMessages.Hello.class);
+            System.out.println("event=lan.hello.success peerDeviceId=" + peer.deviceId()
+                    + " host=" + host + " apiPort=" + apiPort);
+            return peer;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IOException("Interrupted while contacting peer", e);
@@ -48,6 +56,9 @@ public final class ControlPlaneClient {
 
     public void postOfferResult(String host, int apiPort, LanMessages.OfferResult result) {
         try {
+            System.out.println("event=lan.offer.result.outgoing offerId=" + result.offerId()
+                    + " status=" + result.status()
+                    + " host=" + host + " apiPort=" + apiPort);
             post("http://" + host + ":" + apiPort + "/lan/offer-result", result);
         } catch (IOException e) {
             // Best-effort: the sender may have gone away; the receiver's

@@ -36,7 +36,7 @@ export default function TransfersPanel() {
     let cancelled = false;
     const poll = async () => {
       try {
-        const response = await axios.get('/api/transfers');
+        const response = await axios.get('/api/agent/transfers');
         if (!cancelled) setTransfers(response.data ?? []);
       } catch {
         /* keep polling */
@@ -52,7 +52,7 @@ export default function TransfersPanel() {
 
   const act = async (id: string, action: 'pause' | 'resume' | 'cancel') => {
     try {
-      await axios.post(`/api/transfers/${id}`, { action });
+      await axios.post(`/api/agent/transfers/${id}`, { action });
     } catch {
       /* state changed concurrently; next poll corrects the view */
     }
