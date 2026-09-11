@@ -35,6 +35,7 @@ public final class LocalStorageProvider implements StorageProvider {
     private static final int COPY_BUFFER_BYTES = 256 * 1024;
 
     private final Path root;
+    
 
     public LocalStorageProvider(Path dataDir) throws IOException {
         this.root = dataDir.resolve("storage");
